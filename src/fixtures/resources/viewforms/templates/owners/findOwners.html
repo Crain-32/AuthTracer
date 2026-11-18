@@ -1,0 +1,8 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<body>
+<form th:object="${owner}" th:action="@{/owners}" method="get" class="form-horizontal" id="search-owner-form">
+  <input class="form-control" th:field="*{lastName}" size="30" maxlength="80" />
+</form>
+<p th:text="*{owner.firstName}">first name</p>
+</body>
+</html>

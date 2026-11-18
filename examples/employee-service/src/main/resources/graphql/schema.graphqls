@@ -1,0 +1,16 @@
+type Query {
+    employee(id: ID!): Employee
+    employees: [Employee!]!
+}
+
+type Employee {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    email: String!
+    "Masked unless the caller is an ADMIN."
+    ssn: String
+    "Null unless the caller is an ADMIN or an AUDITOR."
+    salary: Float
+    managerUsername: String!
+}

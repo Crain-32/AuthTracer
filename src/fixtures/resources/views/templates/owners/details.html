@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+<body>
+<table th:object="${owner}">
+  <tr><td th:text="*{firstName + ' ' + lastName}"></td></tr>
+</table>
+<div sec:authorize="hasRole('ADMIN')">
+  <span th:text="${owner.ssn}">ssn</span>
+</div>
+<ul>
+  <li th:each="pet : ${owner.pets}" th:text="${pet.name}"></li>
+</ul>
+</body>
+</html>

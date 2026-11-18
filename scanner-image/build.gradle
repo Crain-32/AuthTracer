@@ -1,0 +1,66 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+// The scanner image: the scanner's command for built artifacts, and the container it runs in with no network
+// (src/main/docker). ./gradlew :scanner-image:dockerImage builds authtracer-scanner; scripts/scan-artifacts.sh runs it.
+plugins {
+    id 'application'
+}
+
+version = rootProject.version
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform(SpringBootPlugin.BOM_COORDINATES)
+    implementation project(':annotations')
+    implementation project(':scanner')
+    // The scanner logs through SLF4J; the image prints what it logs to stderr.
+    runtimeOnly 'org.slf4j:slf4j-simple'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    mainClass = 'dev.crain.authtracer.image.ScanArtifacts'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    // ./gradlew test --tests '*SomeTests' runs here too, and is meant for the root project's tests.
+    filter.failOnNoMatchingTests = false
+}
+
+// The image's build context: the Dockerfile and entrypoint, and the scanner's jars in lib/.
+def dockerContext = tasks.register('dockerContext', Sync) {
+    group = 'build'
+    description = 'Assembles the scanner image\'s build context in build/docker.'
+    from(tasks.named('installDist')) {
+        include 'lib/**'
+    }
+    from 'src/main/docker'
+    into layout.buildDirectory.dir('docker')
+}
+
+// docker from the PATH Gradle was run with: a Gradle daemon keeps the PATH it started with, which may not have it.
+def docker = providers.environmentVariable('PATH').map { path ->
+    path.split(File.pathSeparator).collect { new File(it, 'docker') }.find { it.canExecute() }?.absolutePath ?: 'docker'
+}.orElse('docker')
+
+tasks.register('dockerImage', Exec) {
+    group = 'build'
+    description = 'Builds the scanner image, authtracer-scanner (needs Docker).'
+    dependsOn dockerContext
+    workingDir = layout.buildDirectory.dir('docker')
+    commandLine docker.get(), 'build', '--quiet', '--tag', "authtracer-scanner:${project.version}", '--tag',
+            'authtracer-scanner:latest', '.'
+}

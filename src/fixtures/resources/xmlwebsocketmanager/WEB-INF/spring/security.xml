@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">
+    <http>
+        <intercept-url pattern="/**" access="authenticated"/>
+        <http-basic/>
+    </http>
+    <!-- A manager bean of the application's decides every message. -->
+    <websocket-message-broker id="inboundSecurity" authorization-manager-ref="messageManager"/>
+    <!-- Nothing gives the channel this one. -->
+    <websocket-message-broker id="draftSecurity">
+        <intercept-message pattern="/**" access="denyAll"/>
+    </websocket-message-broker>
+</b:beans>

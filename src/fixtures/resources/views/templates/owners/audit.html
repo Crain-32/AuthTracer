@@ -1,0 +1,8 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:replace="~{fragments/ssn :: ssn}"></div>
+<div sec:authorize="hasRole('AUDITOR')">
+  <span th:text="${owner.ssn}">ssn</span>
+</div>
+</body>
+</html>

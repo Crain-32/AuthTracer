@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: billing
+  config:
+    import:
+      - optional:file:./local.yaml
+      - optional:configserver:http://localhost:8888/config
+eureka:
+  client:
+    fetch-registry: "off"
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

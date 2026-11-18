@@ -1,0 +1,21 @@
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - RemoveRequestHeader=Authorization
+            - StripPrefix=1
+          routes:
+            - id: orders
+              uri: http://orders:8081
+              predicates:
+                - Path=/api/orders/**
+            - id: stock
+              uri: http://stock:8082
+              predicates:
+                - Path=/api/stock/**
+              filters:
+                - TokenRelay

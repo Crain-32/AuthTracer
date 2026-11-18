@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AuthTracer</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script>
+    // The theme before the first paint, so a dark page doesn't flash white.
+    try {
+      const theme = localStorage.getItem('authtracer.theme');
+      if (theme === 'dark' || (!theme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch {
+      // No storage: the light theme.
+    }
+  </script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

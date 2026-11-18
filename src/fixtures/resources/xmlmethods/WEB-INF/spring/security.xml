@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">
+    <http>
+        <intercept-url pattern="/**" access="authenticated"/>
+        <http-basic/>
+    </http>
+    <!-- The first pointcut that matches a bean method decides, before its annotations. -->
+    <method-security>
+        <protect-pointcut expression="execution(* fixtures.xmlmethods.Ledger.*(..)) and not execution(* fixtures.xmlmethods.Ledger.balance(..))"
+                          access="hasRole('ACCOUNTANT')"/>
+        <protect-pointcut expression="execution(* fixtures.xmlmethods.Ledger.*(..))" access="hasRole('AUDITOR')"/>
+        <protect-pointcut expression="args(java.lang.String)" access="denyAll"/>
+    </method-security>
+    <!-- Every method of the bean asks for the first protect its name matches, or is denied. -->
+    <b:bean id="reports" class="fixtures.xmlmethods.ReportService">
+        <intercept-methods>
+            <protect method="find*" access="hasRole('VIEWER')"/>
+            <protect method="*Summary" access="hasRole('MANAGER')"/>
+            <protect method="fixtures.xmlmethods.ReportService.purge" access="hasRole('ADMIN')"/>
+        </intercept-methods>
+    </b:bean>
+    <!-- A manager bean defined nowhere AuthTracer looks. -->
+    <b:bean id="vault" class="fixtures.xmlmethods.VaultService">
+        <intercept-methods authorization-manager-ref="vaultManager">
+            <protect method="open" access="denyAll"/>
+        </intercept-methods>
+    </b:bean>
+    <b:bean id="archive" class="fixtures.xmlmethods.ArchiveService">
+        <intercept-methods authorization-manager-ref="archiveManager">
+            <protect method="store" access="permitAll"/>
+        </intercept-methods>
+    </b:bean>
+    <!-- The legacy interceptor: the most specific name wins, and a method none matches is let through. -->
+    <b:bean id="notes" class="fixtures.xmlmethods.NoteService">
+        <intercept-methods use-authorization-manager="false">
+            <protect method="read*" access="ROLE_READER"/>
+            <protect method="readSecret" access="ROLE_KEEPER"/>
+        </intercept-methods>
+    </b:bean>
+</b:beans>

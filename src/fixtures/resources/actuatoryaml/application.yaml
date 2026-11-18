@@ -1,0 +1,10 @@
+management:
+  endpoints:
+    access:
+      default: unrestricted
+    web:
+      exposure:
+        include:
+          - health
+          - env
+          - shutdown

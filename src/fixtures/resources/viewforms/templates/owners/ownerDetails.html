@@ -1,0 +1,19 @@
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<h2>Owner Information</h2>
+<table class="table table-striped" th:object="${owner}">
+  <tr><th>Name</th><td><b th:text="*{firstName + ' ' + lastName}"></b></td></tr>
+  <tr th:with="home=${owner.address}"><th>City</th><td th:text="${home.city}"></td></tr>
+  <tr><th>Telephone</th><td th:text="*{telephone}"></td></tr>
+</table>
+<p>Since [[${T(java.time.Year).now()}]]</p>
+<table class="table table-striped">
+  <tr th:each="pet, status : ${owner.pets}">
+    <td th:text="${status.index}"></td>
+    <td><dl class="dl-horizontal"><dt>Name</dt><dd th:text="${pet.name}"></dd></dl></td>
+    <td sec:authorize="hasRole('VET')" th:text="${pet.microchip}"></td>
+  </tr>
+</table>
+<p>Searching for [[${param.q}]] in [[${session.region}]]</p>
+</body>
+</html>

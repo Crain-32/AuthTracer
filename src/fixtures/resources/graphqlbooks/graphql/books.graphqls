@@ -1,0 +1,42 @@
+type Query {
+  bookById(id: ID!): Book
+  books: [Book!]!
+}
+
+"""
+A book, and what its resolvers add.
+"""
+type Book {
+  "The book's id"
+  id: ID!
+  title: String
+  author: Author
+  reviews: [Review!]! @deprecated(reason: "use ratings")
+  stock: Int @cost
+  price: Price
+  publisher: Publisher
+}
+
+# Federation: the type is resolved here by its key, with no fields of its own here.
+extend type Author @key(fields: "id")
+type Author {
+  id: ID!
+  name: String
+}
+
+type Review {
+  text: String
+  stars: Int
+}
+
+type Price {
+  currency: String
+  amount: Float
+}
+
+type Publisher {
+  name: String
+}
+
+directive @cost on FIELD_DEFINITION
+directive @key(fields: String) on OBJECT

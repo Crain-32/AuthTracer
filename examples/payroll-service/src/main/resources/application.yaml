@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: payroll-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+      client:
+        # payroll-service itself, for the calls no user is behind (its Kafka listener's). identity-service registers
+        # it for client credentials and the read scope only.
+        registration:
+          payroll-service:
+            provider: identity-service
+            client-id: payroll-service
+            client-secret: payroll-secret
+            authorization-grant-type: client_credentials
+            scope: employees.read
+        provider:
+          identity-service:
+            token-uri: http://localhost:9000/oauth2/token
+  grpc:
+    client:
+      channel:
+        employee-service:
+          # employee-service's gRPC server, beside its HTTP port 8082.
+          target: static://localhost:9082
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: payroll-service
+      # A new pay ledger starts from the topic's first change.
+      auto-offset-reset: earliest
+    listener:
+      observation-enabled: true
+  reactor:
+    # Restores the trace (and the rest of a request's context) on the threads a gRPC call runs on.
+    context-propagation: auto
+
+server:
+  port: 8083
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      zipkin:
+        endpoint: http://localhost:9411/api/v2/spans
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health

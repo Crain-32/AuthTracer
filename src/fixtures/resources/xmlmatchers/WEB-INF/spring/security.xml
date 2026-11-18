@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">
+    <!-- A matcher bean picks this chain's requests: the application's own class. -->
+    <http request-matcher-ref="partnerRequests">
+        <intercept-url pattern="/partners/admin/**" access="hasRole('PARTNER_ADMIN')"/>
+        <intercept-url pattern="/partners/**" access="hasRole('PARTNER')"/>
+        <http-basic/>
+    </http>
+    <!-- Rules whose matcher is a bean: Spring's RegexRequestMatcher, and a lambda bean that reads a header. -->
+    <http pattern="/reports/**">
+        <intercept-url request-matcher-ref="exportRequests" access="hasRole('AUDITOR')"/>
+        <intercept-url request-matcher-ref="internalRequests" access="permitAll"/>
+        <intercept-url pattern="/reports/**" access="authenticated"/>
+        <http-basic/>
+    </http>
+    <!-- A RegexRequestMatcher for any method, the application's matcher as an XML bean, and one AuthTracer can't find. -->
+    <http pattern="/audit/**">
+        <intercept-url request-matcher-ref="auditPages" access="hasRole('AUDITOR')"/>
+        <intercept-url request-matcher-ref="partnerMatcher" access="hasRole('PARTNER')"/>
+        <intercept-url request-matcher-ref="unknownRequests" access="permitAll"/>
+        <intercept-url pattern="/audit/**" access="denyAll"/>
+        <http-basic/>
+    </http>
+    <!-- A lambda bean with a captured prefix, a regex for any method, Spring's path matcher a @Bean method builds and a
+         regex given a bean: the last two may match anything. -->
+    <http pattern="/internal/**">
+        <intercept-url request-matcher-ref="internalTools" access="hasRole('INTERNAL')"/>
+        <intercept-url request-matcher-ref="internalAny" access="hasRole('STAFF')"/>
+        <intercept-url request-matcher-ref="apiRequests" access="permitAll"/>
+        <intercept-url request-matcher-ref="flaggedRequests" access="permitAll"/>
+        <intercept-url pattern="/internal/**" access="denyAll"/>
+        <http-basic/>
+    </http>
+    <!-- The manager decides every request of the chain; its intercept-url isn't read. -->
+    <http pattern="/tenants/**" authorization-manager-ref="tenantManager">
+        <intercept-url pattern="/tenants/**" access="permitAll"/>
+        <http-basic/>
+    </http>
+    <!-- A manager bean defined nowhere AuthTracer looks. -->
+    <http pattern="/vendors/**" authorization-manager-ref="vendorManager">
+        <http-basic/>
+    </http>
+    <!-- The legacy FilterSecurityInterceptor with voters: what no rule matches is let through. -->
+    <http pattern="/legacy/**" use-authorization-manager="false" use-expressions="false">
+        <intercept-url pattern="/legacy/admin/**" access="ROLE_ADMIN, ROLE_OPS"/>
+        <intercept-url pattern="/legacy/secure/**" access="IS_AUTHENTICATED_FULLY"/>
+        <form-login/>
+    </http>
+    <http>
+        <intercept-url pattern="/**" access="authenticated"/>
+        <form-login/>
+    </http>
+    <b:bean id="exportRequests" class="org.springframework.security.web.util.matcher.RegexRequestMatcher">
+        <b:constructor-arg value="/reports/[a-z]+/export"/>
+        <b:constructor-arg value="GET"/>
+    </b:bean>
+    <b:bean id="auditPages" class="org.springframework.security.web.util.matcher.RegexRequestMatcher">
+        <b:constructor-arg value="/audit/pages/.*"/>
+    </b:bean>
+    <b:bean id="partnerMatcher" class="fixtures.xmlmatchers.PartnerRequests"/>
+    <b:bean id="internalAny" class="org.springframework.security.web.util.matcher.RegexRequestMatcher">
+        <b:constructor-arg value="/internal/any/.*"/>
+        <b:constructor-arg value=""/>
+    </b:bean>
+    <b:bean id="flaggedRequests" class="org.springframework.security.web.util.matcher.RegexRequestMatcher">
+        <b:constructor-arg ref="flagPattern"/>
+    </b:bean>
+    <b:bean id="flagPattern" class="java.lang.String">
+        <b:constructor-arg value="/internal/flags/.*"/>
+    </b:bean>
+    <b:bean id="tenantManager" class="fixtures.xmlmatchers.TenantManager"/>
+</b:beans>

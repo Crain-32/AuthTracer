@@ -1,0 +1,1277 @@
+{
+  "schemaVersion" : 1,
+  "service" : "employee-service",
+  "revision" : "golden",
+  "port" : 8082,
+  "authoritySource" : {
+    "kind" : "JWT_CLAIMS",
+    "freshness" : "SNAPSHOT",
+    "detail" : "OAuth2 Resource Server (JWT); authorities: roles → ROLE_*, scope → SCOPE_*",
+    "granted" : [ "FACTOR_BEARER", "ROLE_*", "ROLE_ANONYMOUS", "SCOPE_*" ],
+    "jwt" : {
+      "authorities" : [ {
+        "claims" : [ "roles" ],
+        "prefix" : "ROLE_"
+      }, {
+        "claims" : [ "scope", "scp" ],
+        "prefix" : "SCOPE_"
+      } ],
+      "validators" : [ "issuer" ]
+    }
+  },
+  "nodes" : [ {
+    "type" : "egress",
+    "id" : "egress:dev.crain.employeeservice.employee.SalaryChanges#publish(long,java.math.BigDecimal,java.math.BigDecimal,java.lang.String) KAFKA employee.salary-changed",
+    "client" : "KafkaTemplate",
+    "httpMethod" : "KAFKA",
+    "uriTemplate" : "employee.salary-changed",
+    "callSite" : {
+      "className" : "dev.crain.employeeservice.employee.SalaryChanges",
+      "method" : "publish(long,java.math.BigDecimal,java.math.BigDecimal,java.lang.String)",
+      "line" : 25
+    },
+    "request" : {
+      "type" : "dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged",
+      "many" : false
+    }
+  }, {
+    "type" : "egress",
+    "id" : "egress:org.springframework.boot.security.oauth2.server.resource.autoconfigure.JwtDecoderConfiguration GET /.well-known/openid-configuration",
+    "client" : "JwtDecoder",
+    "httpMethod" : "GET",
+    "uriTemplate" : "/.well-known/openid-configuration",
+    "baseUrl" : "http://localhost:9000",
+    "callSite" : {
+      "className" : "org.springframework.boot.security.oauth2.server.resource.autoconfigure.JwtDecoderConfiguration"
+    },
+    "credentials" : "NONE"
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.email",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "email",
+    "jsonName" : "email",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.firstName",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "firstName",
+    "jsonName" : "firstName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.id",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "id",
+    "jsonName" : "id",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.lastName",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "lastName",
+    "jsonName" : "lastName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.managerUsername",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "managerUsername",
+    "jsonName" : "managerUsername",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.salary",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "salary",
+    "jsonName" : "salary",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.admin.AdminEmployeeController$SalaryUpdate.salary",
+    "owner" : "dev.crain.employeeservice.admin.AdminEmployeeController$SalaryUpdate",
+    "name" : "salary",
+    "jsonName" : "salary",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$CompensationView.at",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$CompensationView",
+    "name" : "at",
+    "jsonName" : "at",
+    "javaType" : "java.time.Instant",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$CompensationView.employeeId",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$CompensationView",
+    "name" : "employeeId",
+    "jsonName" : "employeeId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$CompensationView.viewedBy",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$CompensationView",
+    "name" : "viewedBy",
+    "jsonName" : "viewedBy",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$SalaryChange.at",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$SalaryChange",
+    "name" : "at",
+    "jsonName" : "at",
+    "javaType" : "java.time.Instant",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$SalaryChange.current",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$SalaryChange",
+    "name" : "current",
+    "jsonName" : "current",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$SalaryChange.employeeId",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$SalaryChange",
+    "name" : "employeeId",
+    "jsonName" : "employeeId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.AuditService$SalaryChange.previous",
+    "owner" : "dev.crain.employeeservice.audit.AuditService$SalaryChange",
+    "name" : "previous",
+    "jsonName" : "previous",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed.at",
+    "owner" : "dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed",
+    "name" : "at",
+    "jsonName" : "at",
+    "javaType" : "java.time.Instant",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed.employeeId",
+    "owner" : "dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed",
+    "name" : "employeeId",
+    "jsonName" : "employeeId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed.viewedBy",
+    "owner" : "dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed",
+    "name" : "viewedBy",
+    "jsonName" : "viewedBy",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.email",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "email",
+    "jsonName" : "email",
+    "javaType" : "java.lang.String",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.firstName",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "firstName",
+    "jsonName" : "firstName",
+    "javaType" : "java.lang.String",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.id",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "id",
+    "jsonName" : "id",
+    "javaType" : "long",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.lastName",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "lastName",
+    "jsonName" : "lastName",
+    "javaType" : "java.lang.String",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.managerUsername",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "managerUsername",
+    "jsonName" : "managerUsername",
+    "javaType" : "java.lang.String",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.salary",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "salary",
+    "jsonName" : "salary",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.Employee.ssn",
+    "owner" : "dev.crain.employeeservice.employee.Employee",
+    "name" : "ssn",
+    "jsonName" : "ssn",
+    "javaType" : "java.lang.String",
+    "declassified" : false,
+    "graphQl" : true
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.email",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "email",
+    "jsonName" : "email",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.firstName",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "firstName",
+    "jsonName" : "firstName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.id",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "id",
+    "jsonName" : "id",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.lastName",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "lastName",
+    "jsonName" : "lastName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.managerUsername",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "managerUsername",
+    "jsonName" : "managerUsername",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.salary",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "salary",
+    "jsonName" : "salary",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.EmployeeResponse.ssn",
+    "owner" : "dev.crain.employeeservice.employee.EmployeeResponse",
+    "name" : "ssn",
+    "jsonName" : "ssn",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.at",
+    "owner" : "dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged",
+    "name" : "at",
+    "jsonName" : "at",
+    "javaType" : "java.time.Instant",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.changedBy",
+    "owner" : "dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged",
+    "name" : "changedBy",
+    "jsonName" : "changedBy",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.current",
+    "owner" : "dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged",
+    "name" : "current",
+    "jsonName" : "current",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.employeeId",
+    "owner" : "dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged",
+    "name" : "employeeId",
+    "jsonName" : "employeeId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.previous",
+    "owner" : "dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged",
+    "name" : "previous",
+    "jsonName" : "previous",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /.well-known/oauth-protected-resource/**",
+    "httpMethod" : "GET",
+    "route" : "/.well-known/oauth-protected-resource/**",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.resource.web.OAuth2ProtectedResourceMetadataFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /actuator/health",
+    "httpMethod" : "GET",
+    "route" : "/actuator/health",
+    "handler" : {
+      "className" : "org.springframework.boot.health.actuate.endpoint.HealthEndpoint",
+      "method" : "health()"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /actuator/health/{*path}",
+    "httpMethod" : "GET",
+    "route" : "/actuator/health/{*path}",
+    "handler" : {
+      "className" : "org.springframework.boot.health.actuate.endpoint.HealthEndpoint",
+      "method" : "healthForPath(java.lang.String[])"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /audit/employees/{id}",
+    "httpMethod" : "GET",
+    "route" : "/audit/employees/{id}",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.audit.AuditController",
+      "method" : "history(long,org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.audit.AuditService$SalaryChange",
+      "many" : true
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /audit/employees/{id}/views",
+    "httpMethod" : "GET",
+    "route" : "/audit/employees/{id}/views",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.audit.AuditController",
+      "method" : "views(long,org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.audit.AuditService$CompensationView",
+      "many" : true
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /employees",
+    "httpMethod" : "GET",
+    "route" : "/employees",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeController",
+      "method" : "list(org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.employee.EmployeeResponse",
+      "many" : true
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /employees/{id}",
+    "httpMethod" : "GET",
+    "route" : "/employees/{id}",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeController",
+      "method" : "get(long,org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.employee.EmployeeResponse",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "httpMethod" : "GRPC",
+    "route" : "employees.v1.EmployeeDirectory/GetEmployee",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.directory.EmployeeDirectoryService",
+      "method" : "getEmployee(dev.crain.employees.v1.GetEmployeeRequest,io.grpc.stub.StreamObserver)"
+    },
+    "response" : {
+      "type" : "dev.crain.employees.v1.EmployeeRecord",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GRPC grpc.health.v1.Health/Check",
+    "httpMethod" : "GRPC",
+    "route" : "grpc.health.v1.Health/Check",
+    "handler" : {
+      "className" : "org.springframework.boot.grpc.server.autoconfigure.GrpcServerServicesAutoConfiguration"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GRPC grpc.health.v1.Health/Watch",
+    "httpMethod" : "GRPC",
+    "route" : "grpc.health.v1.Health/Watch",
+    "handler" : {
+      "className" : "org.springframework.boot.grpc.server.autoconfigure.GrpcServerServicesAutoConfiguration"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GRPC grpc.reflection.v1.ServerReflection/ServerReflectionInfo",
+    "httpMethod" : "GRPC",
+    "route" : "grpc.reflection.v1.ServerReflection/ServerReflectionInfo",
+    "handler" : {
+      "className" : "org.springframework.boot.grpc.server.autoconfigure.GrpcServerServicesAutoConfiguration"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:PUT /admin/employees/{id}/salary",
+    "httpMethod" : "PUT",
+    "route" : "/admin/employees/{id}/salary",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.admin.AdminEmployeeController",
+      "method" : "updateSalary(long,dev.crain.employeeservice.admin.AdminEmployeeController$SalaryUpdate,org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.employee.EmployeeResponse",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:QUERY employee",
+    "httpMethod" : "QUERY",
+    "route" : "employee",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeGraphQlController",
+      "method" : "employee(long,org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.employee.Employee",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:QUERY employees",
+    "httpMethod" : "QUERY",
+    "route" : "employees",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeGraphQlController",
+      "method" : "employees(org.springframework.security.core.Authentication)"
+    },
+    "response" : {
+      "type" : "dev.crain.employeeservice.employee.Employee",
+      "many" : true
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:RABBIT audit.compensation-viewed",
+    "httpMethod" : "RABBIT",
+    "route" : "audit.compensation-viewed",
+    "handler" : {
+      "className" : "dev.crain.employeeservice.audit.CompensationViewListener",
+      "method" : "compensationViewed(dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed)"
+    },
+    "request" : {
+      "type" : "dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed",
+      "many" : false
+    }
+  }, {
+    "type" : "location",
+    "id" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "FIELD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN", "ROLE_AUDITOR" ],
+      "expression" : "hasAnyRole('ADMIN','AUDITOR')"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.employee.Employee",
+      "method" : "getSalary()"
+    },
+    "field" : "salary",
+    "denial" : {
+      "kind" : "NULL",
+      "handler" : "org.springframework.security.authorization.method.NullReturningMethodAuthorizationDeniedHandler"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "FIELD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "hasRole('ADMIN')"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.employee.Employee",
+      "method" : "getSsn()"
+    },
+    "field" : "ssn",
+    "denial" : {
+      "kind" : "HANDLER",
+      "handler" : "dev.crain.employeeservice.employee.SsnMaskingHandler"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):0:/actuator/health",
+    "mechanism" : "authorizeHttpRequests",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "PERMIT_ALL"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter)",
+      "line" : 25
+    },
+    "routePattern" : "/actuator/health",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):1:/admin/**",
+    "mechanism" : "authorizeHttpRequests",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "hasRole(ADMIN)"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter)",
+      "line" : 26
+    },
+    "routePattern" : "/admin/**",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "mechanism" : "authorizeHttpRequests",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "AUTHENTICATED"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter)",
+      "line" : 27
+    },
+    "routePattern" : "anyRequest",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):0:grpc.*/*",
+    "mechanism" : "authorizeRequests (gRPC)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "PERMIT_ALL"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.security.SecurityConfig",
+      "method" : "grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter)",
+      "line" : 43
+    },
+    "routePattern" : "grpc.*/*",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):1:employees.v1.EmployeeDirectory/*",
+    "mechanism" : "authorizeRequests (gRPC)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_employees.read" ],
+      "expression" : "hasAuthority(SCOPE_employees.read)"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.security.SecurityConfig",
+      "method" : "grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter)",
+      "line" : 44
+    },
+    "routePattern" : "employees.v1.EmployeeDirectory/*",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:resource-server:metadata",
+    "mechanism" : "OAuth2 Resource Server (public: answers before authorization)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "PERMIT_ALL"
+    },
+    "target" : {
+      "className" : "org.springframework.security.oauth2.server.resource.web.OAuth2ProtectedResourceMetadataFilter"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.employeeservice.audit.AuditService#history(long):@Secured",
+    "mechanism" : "@Secured",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_AUDITOR" ],
+      "expression" : "ROLE_AUDITOR"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.audit.AuditService",
+      "method" : "history(long)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.employeeservice.audit.AuditService#views(long):@Secured",
+    "mechanism" : "@Secured",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_AUDITOR" ],
+      "expression" : "ROLE_AUDITOR"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.audit.AuditService",
+      "method" : "views(long)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_employees.read" ],
+      "expression" : "hasAuthority('SCOPE_employees.read')"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeService",
+      "method" : "find(long)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PostFilter",
+    "mechanism" : "@PostFilter",
+    "scope" : "METHOD",
+    "phase" : "POST",
+    "requirement" : {
+      "kind" : "OR",
+      "operands" : [ {
+        "kind" : "ANY_AUTHORITY",
+        "authorities" : [ "ROLE_ADMIN" ]
+      }, {
+        "kind" : "EXPRESSION",
+        "expression" : "(filterObject.managerUsername == authentication.name)"
+      } ],
+      "expression" : "hasRole('ADMIN') or filterObject.managerUsername == authentication.name"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeService",
+      "method" : "list()"
+    },
+    "denial" : {
+      "kind" : "FILTER"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_employees.read" ],
+      "expression" : "hasAuthority('SCOPE_employees.read')"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeService",
+      "method" : "list()"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#updateSalary(long,java.math.BigDecimal):@RolesAllowed",
+    "mechanism" : "@RolesAllowed",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "ADMIN"
+    },
+    "target" : {
+      "className" : "dev.crain.employeeservice.employee.EmployeeService",
+      "method" : "updateSalary(long,java.math.BigDecimal)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  } ],
+  "edges" : [ {
+    "from" : "ingress:GET /.well-known/oauth-protected-resource/**",
+    "to" : "location:HTTP_REQUEST:resource-server:metadata",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /.well-known/oauth-protected-resource/**",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /actuator/health",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):0:/actuator/health",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /actuator/health",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /actuator/health/{*path}",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /actuator/health/{*path}",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /audit/employees/{id}",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /audit/employees/{id}",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "to" : "location:METHOD:dev.crain.employeeservice.audit.AuditService#history(long):@Secured",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /audit/employees/{id}",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.audit.AuditController#history(long,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.audit.AuditService#history(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /audit/employees/{id}/views",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /audit/employees/{id}/views",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "to" : "location:METHOD:dev.crain.employeeservice.audit.AuditService#views(long):@Secured",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /audit/employees/{id}/views",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.audit.AuditController#views(long,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.audit.AuditService#views(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /employees",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#list(org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#list()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PreAuthorize",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PostFilter",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees",
+    "order" : 3,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#list(org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#list()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PostFilter",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees",
+    "order" : 4,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#list(org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeResponse#from(dev.crain.employeeservice.employee.Employee)", "dev.crain.employeeservice.employee.Employee#getSsn()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees",
+    "order" : 5,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#list(org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeResponse#from(dev.crain.employeeservice.employee.Employee)", "dev.crain.employeeservice.employee.Employee#getSalary()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /employees/{id}",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees/{id}",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees/{id}",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#get(long,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#find(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees/{id}",
+    "order" : 3,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#get(long,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeResponse#from(dev.crain.employeeservice.employee.Employee)", "dev.crain.employeeservice.employee.Employee#getSsn()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /employees/{id}",
+    "order" : 4,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeController#get(long,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeResponse#from(dev.crain.employeeservice.employee.Employee)", "dev.crain.employeeservice.employee.Employee#getSalary()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):1:employees.v1.EmployeeDirectory/*",
+    "kind" : "LOCAL",
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):1:employees.v1.EmployeeDirectory/*",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.directory.EmployeeDirectoryService#getEmployee(dev.crain.employees.v1.GetEmployeeRequest,io.grpc.stub.StreamObserver)", "dev.crain.employeeservice.employee.EmployeeService#find(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "order" : 3,
+    "via" : [ "dev.crain.employeeservice.directory.EmployeeDirectoryService#getEmployee(dev.crain.employees.v1.GetEmployeeRequest,io.grpc.stub.StreamObserver)", "dev.crain.employeeservice.employee.Employee#getSalary()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GRPC grpc.health.v1.Health/Check",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):0:grpc.*/*",
+    "kind" : "LOCAL",
+    "path" : "ingress:GRPC grpc.health.v1.Health/Check",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GRPC grpc.health.v1.Health/Watch",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):0:grpc.*/*",
+    "kind" : "LOCAL",
+    "path" : "ingress:GRPC grpc.health.v1.Health/Watch",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GRPC grpc.reflection.v1.ServerReflection/ServerReflectionInfo",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#grpcApiSecurity(org.springframework.grpc.server.security.GrpcSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):0:grpc.*/*",
+    "kind" : "LOCAL",
+    "path" : "ingress:GRPC grpc.reflection.v1.ServerReflection/ServerReflectionInfo",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:PUT /admin/employees/{id}/salary",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):1:/admin/**",
+    "kind" : "LOCAL",
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):1:/admin/**",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#updateSalary(long,java.math.BigDecimal):@RolesAllowed",
+    "kind" : "LOCAL",
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.admin.AdminEmployeeController#updateSalary(long,dev.crain.employeeservice.admin.AdminEmployeeController$SalaryUpdate,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#updateSalary(long,java.math.BigDecimal)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#updateSalary(long,java.math.BigDecimal):@RolesAllowed",
+    "to" : "egress:dev.crain.employeeservice.employee.SalaryChanges#publish(long,java.math.BigDecimal,java.math.BigDecimal,java.lang.String) KAFKA employee.salary-changed",
+    "kind" : "LOCAL",
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "order" : 3,
+    "via" : [ "dev.crain.employeeservice.admin.AdminEmployeeController#updateSalary(long,dev.crain.employeeservice.admin.AdminEmployeeController$SalaryUpdate,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#updateSalary(long,java.math.BigDecimal)", "dev.crain.employeeservice.employee.SalaryChanges#publish(long,java.math.BigDecimal,java.math.BigDecimal,java.lang.String)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:QUERY employee",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employee",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employee",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeGraphQlController#employee(long,org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#find(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#find(long):@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employee",
+    "order" : 3,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employee",
+    "order" : 4,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:QUERY employees",
+    "to" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employees",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.employeeservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.annotation.web.builders.HttpSecurity,org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter):2:anyRequest",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employees",
+    "order" : 2,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeGraphQlController#employees(org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#list()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PreAuthorize",
+    "to" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PostFilter",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employees",
+    "order" : 3,
+    "via" : [ "dev.crain.employeeservice.employee.EmployeeGraphQlController#employees(org.springframework.security.core.Authentication)", "dev.crain.employeeservice.employee.EmployeeService#list()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.employeeservice.employee.EmployeeService#list():@PostFilter",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employees",
+    "order" : 4,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSalary():@PreAuthorize",
+    "to" : "location:FIELD:dev.crain.employeeservice.employee.Employee#getSsn():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:QUERY employees",
+    "order" : 5,
+    "via" : [ ],
+    "bidirectional" : false
+  } ],
+  "flows" : [ {
+    "path" : "egress:dev.crain.employeeservice.employee.SalaryChanges#publish(long,java.math.BigDecimal,java.math.BigDecimal,java.lang.String) KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.employeeservice.admin.AdminEmployeeController$SalaryUpdate.salary",
+    "to" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.current",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "egress:dev.crain.employeeservice.employee.SalaryChanges#publish(long,java.math.BigDecimal,java.math.BigDecimal,java.lang.String) KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.salary",
+    "to" : "field:dev.crain.employeeservice.employee.SalaryChanges$SalaryChanged.previous",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.email",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.email",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.firstName",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.firstName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.id",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.id",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.lastName",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.lastName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.managerUsername",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.managerUsername",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.salary",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.salary",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.ssn",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.ssn",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.email",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.email",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.firstName",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.firstName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.id",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.id",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.lastName",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.lastName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.managerUsername",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.managerUsername",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.salary",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.salary",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /employees/{id}",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.ssn",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.ssn",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.email",
+    "to" : "field:dev.crain.employees.v1.EmployeeRecord.email",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.firstName",
+    "to" : "field:dev.crain.employees.v1.EmployeeRecord.firstName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.id",
+    "to" : "field:dev.crain.employees.v1.EmployeeRecord.id",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.lastName",
+    "to" : "field:dev.crain.employees.v1.EmployeeRecord.lastName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.managerUsername",
+    "to" : "field:dev.crain.employees.v1.EmployeeRecord.managerUsername",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.salary",
+    "to" : "field:dev.crain.employees.v1.EmployeeRecord.salary",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.email",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.email",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.firstName",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.firstName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.id",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.id",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.lastName",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.lastName",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.managerUsername",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.managerUsername",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.salary",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.salary",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:PUT /admin/employees/{id}/salary",
+    "from" : "field:dev.crain.employeeservice.employee.Employee.ssn",
+    "to" : "field:dev.crain.employeeservice.employee.EmployeeResponse.ssn",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:RABBIT audit.compensation-viewed",
+    "from" : "field:dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed.at",
+    "to" : "field:dev.crain.employeeservice.audit.AuditService$CompensationView.at",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:RABBIT audit.compensation-viewed",
+    "from" : "field:dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed.employeeId",
+    "to" : "field:dev.crain.employeeservice.audit.AuditService$CompensationView.employeeId",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:RABBIT audit.compensation-viewed",
+    "from" : "field:dev.crain.employeeservice.audit.CompensationViewListener$CompensationViewed.viewedBy",
+    "to" : "field:dev.crain.employeeservice.audit.AuditService$CompensationView.viewedBy",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  } ],
+  "provided" : [ ],
+  "findings" : [ {
+    "kind" : "BYPASSED",
+    "message" : "On PUT /admin/employees/{id}/salary: @PreAuthorize on dev.crain.employeeservice.employee.Employee#getSalary() is skipped when dev.crain.employeeservice.employee.EmployeeResponse#from(dev.crain.employeeservice.employee.Employee) reads it: the object it reads does not come from an @AuthorizeReturnObject method or AuthorizationProxyFactory, so it is not an authorization proxy",
+    "location" : {
+      "className" : "dev.crain.employeeservice.employee.Employee",
+      "method" : "getSalary()"
+    }
+  }, {
+    "kind" : "BYPASSED",
+    "message" : "On PUT /admin/employees/{id}/salary: @PreAuthorize on dev.crain.employeeservice.employee.Employee#getSalary() is skipped when dev.crain.employeeservice.employee.EmployeeService#updateSalary(long,java.math.BigDecimal) reads it: the object it reads does not come from an @AuthorizeReturnObject method or AuthorizationProxyFactory, so it is not an authorization proxy",
+    "location" : {
+      "className" : "dev.crain.employeeservice.employee.Employee",
+      "method" : "getSalary()"
+    }
+  }, {
+    "kind" : "BYPASSED",
+    "message" : "On PUT /admin/employees/{id}/salary: @PreAuthorize on dev.crain.employeeservice.employee.Employee#getSsn() is skipped when dev.crain.employeeservice.employee.EmployeeResponse#from(dev.crain.employeeservice.employee.Employee) reads it: the object it reads does not come from an @AuthorizeReturnObject method or AuthorizationProxyFactory, so it is not an authorization proxy",
+    "location" : {
+      "className" : "dev.crain.employeeservice.employee.Employee",
+      "method" : "getSsn()"
+    }
+  } ]
+}

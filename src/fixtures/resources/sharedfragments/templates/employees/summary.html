@@ -1,0 +1,9 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<h1 th:text="${employee.name}">name</h1>
+<div th:replace="~{fragments/contact :: contact}"></div>
+<p sec:authorize="hasRole('HR')">
+  <span th:text="${employee.salary}">salary</span>
+</p>
+</body>
+</html>

@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes-map:
+            payments:
+              uri: http://payments:8084
+              predicates:
+                - Path=/api/payments/**
+                - Method=GET,POST
+              filters:
+                - StripPrefix=1
+            refunds:
+              id: refunds-route
+              uri: http://payments:8084
+              predicates:
+                - Path=/api/refunds/**
+              filters:
+                - SetRequestHeader=Authorization, Bearer static-token

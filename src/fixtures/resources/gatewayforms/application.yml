@@ -1,0 +1,46 @@
+teams:
+  host: teams.internal
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: billing
+              uri: http://localhost:8086
+              predicates:
+                - name: Path
+                  args:
+                    patterns: /billing/**
+                - Host=**.example.org
+              filters:
+                - name: RewritePath
+                  args:
+                    regexp: /billing/(?<segment>.*)
+                    replacement: /invoices/$\{segment}
+                - RemoveRequestHeader=Cookie
+            - id: red
+              uri: http://localhost:8087
+              predicates:
+                - Path=/red,/red/**
+              filters:
+                - RewritePath=/red(?<segment>/?.*), $\{segment}
+                - AddRequestHeader=X-Source, gateway
+            - id: partner
+              uri: https://partner.example.com
+              predicates:
+                - Path=/partner/**
+              filters:
+                - SetPath=/v2/feed
+                - SetRequestHeader=Authorization, Basic cGFydG5lcjpzZWNyZXQ=
+            - id: legacy
+              uri: http://localhost:8088
+              predicates:
+                - Path=/legacy/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    _genkey_0: "1"
+                - PrefixPath=/api

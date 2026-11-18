@@ -1,0 +1,7 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<ul>
+  <li th:each="p : ${petList}" th:text="${p.name}"></li>
+</ul>
+</body>
+</html>

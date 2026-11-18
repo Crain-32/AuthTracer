@@ -1,0 +1,9 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="ssn">
+  <div sec:authorize="hasRole('ADMIN')">
+    <span th:text="${owner.ssn}">ssn</span>
+  </div>
+</div>
+</body>
+</html>

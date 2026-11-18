@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: AuthTracer
+  datasource:
+    # File-backed so graphs survive restarts. H2 closes itself on JVM exit otherwise, before Spring's shutdown,
+    # which logs a spurious error.
+    url: jdbc:h2:file:./data/authtracer;DB_CLOSE_ON_EXIT=FALSE
+  sql:
+    init:
+      mode: always
+  jackson:
+    # Graphs posted by older scanners may lack newer properties.
+    deserialization:
+      fail-on-null-for-primitives: false
+      fail-on-unknown-properties: false
+
+server:
+  port: 8080
+  # The API has no authentication: it answers this machine only unless told otherwise (--server.address=0.0.0.0).
+  address: 127.0.0.1
+
+authtracer:
+  api:
+    # The most a posted graph may be (POST /api/graphs and /api/exposures); larger bodies are answered with 413.
+    max-body-size: 64MB
+  zipkin:
+    base-url: http://localhost:9411
+    lookback: 60m
+    limit: 1000
+
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  logging:
+    export:
+      otlp:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false

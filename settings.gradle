@@ -1,0 +1,4 @@
+rootProject.name = 'AuthTracer'
+include 'annotations'
+include 'scanner'
+include 'scanner-image'

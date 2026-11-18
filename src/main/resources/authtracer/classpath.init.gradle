@@ -1,0 +1,55 @@
+// Used by AuthTracer to read a Gradle project's compiled classes and runtime classpath: the project in the directory
+// Gradle runs in, not every project under it, which a task selected by name would also run in.
+allprojects { project ->
+    if (project.projectDir.canonicalFile != gradle.startParameter.currentDir.canonicalFile) {
+        return
+    }
+    plugins.withId('java') {
+        tasks.register('authtracerClasspath') {
+            // The runtime classpath's own build dependencies too: a sibling module's jar is built, not read stale
+            // or found missing in a fresh checkout.
+            dependsOn 'classes', project.sourceSets.main.runtimeClasspath
+            def classes = project.provider { project.sourceSets.main.output.classesDirs.asPath }
+            // The processed resources, and a web application's src/main/webapp (WEB-INF's XML configuration).
+            def resources = project.provider {
+                def dirs = [project.sourceSets.main.output.resourcesDir?.absolutePath]
+                def webapp = project.file('src/main/webapp')
+                if (webapp.isDirectory()) {
+                    dirs << webapp.absolutePath
+                }
+                dirs.findAll { it }.join(File.pathSeparator)
+            }
+            def runtime = project.provider { project.sourceSets.main.runtimeClasspath.filter { it.name.endsWith('.jar') }.asPath }
+            // Directories on the runtime classpath other than the project's own output: not read as libraries.
+            def ignored = project.provider {
+                def own = (project.sourceSets.main.output.classesDirs.files
+                        + [project.sourceSets.main.output.resourcesDir]).findAll { it }.collect { it.canonicalFile }
+                project.sourceSets.main.runtimeClasspath.files.findAll {
+                    !it.name.endsWith('.jar') && it.exists() && !own.contains(it.canonicalFile)
+                }.join(File.pathSeparator)
+            }
+            doLast {
+                println "AUTHTRACER_CLASSES=" + classes.get()
+                println "AUTHTRACER_RESOURCES=" + resources.get()
+                println "AUTHTRACER_LIBRARIES=" + runtime.get()
+                println "AUTHTRACER_IGNORED=" + ignored.get()
+            }
+        }
+    }
+    afterEvaluate {
+        if (!plugins.hasPlugin('java')) {
+            // Not a Java project itself, such as the root of a multi-project build: which of its projects is the
+            // service? A Spring Boot application's marked "boot".
+            tasks.register('authtracerClasspath') {
+                def modules = project.provider {
+                    project.subprojects.findAll { it.plugins.hasPlugin('java') }.collect {
+                        (it.plugins.hasPlugin('org.springframework.boot') ? 'boot=' : 'java=') + it.projectDir.absolutePath
+                    }
+                }
+                doLast {
+                    modules.get().each { println "AUTHTRACER_SUBPROJECT=" + it }
+                }
+            }
+        }
+    }
+}

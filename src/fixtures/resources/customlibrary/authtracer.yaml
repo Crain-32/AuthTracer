@@ -1,0 +1,7 @@
+version: 1
+rules:
+  - annotation: fixtures.customlibrary.RequiresPermission
+    requires: "hasAuthority('PERM_{value}')"
+    reason: the permission aspect needs any of the permissions it names
+  - call: "fixtures.customlibrary.Guard#require"
+    requires: "hasAuthority('PERM_{arg0}')"

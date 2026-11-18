@@ -1,0 +1,22 @@
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<h2>Owner</h2>
+<p>Signed in as [[${currentUser.name}]]</p>
+<form th:object="${owner}" class="form-horizontal" id="add-owner-form" method="post">
+  <div class="form-group has-feedback">
+    <input th:replace="~{fragments/inputField :: input ('First Name', 'firstName', 'text')}" />
+    <input th:replace="~{fragments/inputField :: input ('Last Name', 'lastName', 'text')}" />
+    <div sec:authorize="hasRole('OFFICE')">
+      <input th:replace="~{fragments/inputField :: input (label='Telephone', name='telephone', type='text')}" />
+      <input type="hidden" th:field="*{id}" required></input>
+      <span th:text='*{address.city}'>city</span>
+    </div>
+  </div>
+  <button th:with="text=${owner['new']} ? 'Add Owner' : 'Update Owner'" class="btn btn-primary" type="submit"
+    th:text="${text}">Add Owner</button>
+</form>
+<div th:replace="~{fragments/divider :: divider}"></div>
+<p th:text="${counts.owners}">0</p>
+<div th:replace="~{fragments/divider :: divider}"></div>
+</body>
+</html>

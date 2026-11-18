@@ -1,0 +1,5 @@
+mutation rename($id: ID!, $name: String!) {
+  renamed: rename(id: $id, name: $name) {
+    name
+  }
+}

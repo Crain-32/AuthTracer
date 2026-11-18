@@ -1,0 +1,56 @@
+{
+  "machine" : "Mac OS X aarch64, 18 cores, 128 GB, Java 25",
+  "revision" : "2bc25d7f-dirty",
+  "recorded" : "2026-10-19",
+  "metrics" : {
+    "scan 14 fixtures" : {
+      "ms/op" : 1981.0,
+      "cpu ms/op" : 2745.0,
+      "MB/op" : 3281.0
+    },
+    "scan profile-service" : {
+      "ms/op" : 38.86,
+      "cpu ms/op" : 63.4,
+      "MB/op" : 69.32
+    },
+    "scan employee-service" : {
+      "ms/op" : 87.71,
+      "cpu ms/op" : 159.2,
+      "MB/op" : 205.6
+    },
+    "scan identity-service" : {
+      "ms/op" : 14.71,
+      "cpu ms/op" : 24.23,
+      "MB/op" : 25.95
+    },
+    "scan payroll-service" : {
+      "ms/op" : 84.88,
+      "cpu ms/op" : 147.0,
+      "MB/op" : 194.2
+    },
+    "link example services with traces" : {
+      "ms/op" : 2.598,
+      "cpu ms/op" : 2.792,
+      "MB/op" : 6.685
+    },
+    "exposures of example system" : {
+      "ms/op" : 0.4339,
+      "cpu ms/op" : 0.4363,
+      "MB/op" : 1.415
+    },
+    "diff example system" : {
+      "ms/op" : 1.108,
+      "cpu ms/op" : 1.126,
+      "MB/op" : 3.777
+    },
+    "JSON round trip of example system" : {
+      "ms/op" : 0.3819,
+      "cpu ms/op" : 0.3884,
+      "MB/op" : 1.798
+    },
+    "UI scripts and styles" : {
+      "size KB" : 690.6,
+      "gzip KB" : 212.7
+    }
+  }
+}

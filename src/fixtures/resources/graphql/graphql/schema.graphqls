@@ -1,0 +1,37 @@
+"The people directory."
+type Query {
+  person(id: ID!): Person
+  everyone: [Person!]!
+  version: String
+}
+
+type Mutation {
+  rename(id: ID!, name: String!): Person
+}
+
+interface Named {
+  name: String
+}
+
+"""
+Team.budget is in the Java record, not in the schema: GraphQL never returns it.
+"""
+type Person implements Named @key(fields: "id") {
+  id: ID!
+  name: String
+  salary: Float @deprecated(reason: "use pay")
+  manager: Person
+  team: Team
+  nickname(style: String = "short"): String
+  badge: String
+}
+
+type Team {
+  name: String
+}
+
+input PersonFilter {
+  budget: Float
+}
+
+directive @key(fields: String) on OBJECT

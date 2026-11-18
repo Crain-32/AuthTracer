@@ -1,0 +1,883 @@
+{
+  "schemaVersion" : 1,
+  "service" : "payroll-service",
+  "revision" : "golden",
+  "port" : 8083,
+  "authoritySource" : {
+    "kind" : "JWT_CLAIMS",
+    "freshness" : "SNAPSHOT",
+    "detail" : "OAuth2 Resource Server (JWT); authorities: roles → ROLE_*, scope → SCOPE_*",
+    "granted" : [ "FACTOR_BEARER", "ROLE_*", "ROLE_ANONYMOUS", "SCOPE_*" ],
+    "jwt" : {
+      "authorities" : [ {
+        "claims" : [ "roles" ],
+        "prefix" : "ROLE_"
+      }, {
+        "claims" : [ "scope", "scp" ],
+        "prefix" : "SCOPE_"
+      } ],
+      "validators" : [ "issuer" ]
+    }
+  },
+  "nodes" : [ {
+    "type" : "egress",
+    "id" : "egress:dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employee(long) GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "client" : "gRPC",
+    "httpMethod" : "GRPC",
+    "uriTemplate" : "employees.v1.EmployeeDirectory/GetEmployee",
+    "baseUrlExpression" : "static://localhost:9082",
+    "callSite" : {
+      "className" : "dev.crain.payrollservice.employeeservice.EmployeeServiceClient",
+      "method" : "employee(long)",
+      "line" : 47
+    },
+    "response" : {
+      "type" : "dev.crain.employees.v1.EmployeeRecord",
+      "many" : false
+    },
+    "credentials" : "RELAY",
+    "credentialsVia" : "BearerTokenAuthenticationInterceptor: the caller's token, from EmployeeServiceClient#employee"
+  }, {
+    "type" : "egress",
+    "id" : "egress:dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employeeAsPayroll(long) GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "client" : "gRPC",
+    "httpMethod" : "GRPC",
+    "uriTemplate" : "employees.v1.EmployeeDirectory/GetEmployee",
+    "baseUrlExpression" : "static://localhost:9082",
+    "callSite" : {
+      "className" : "dev.crain.payrollservice.employeeservice.EmployeeServiceClient",
+      "method" : "employeeAsPayroll(long)",
+      "line" : 65
+    },
+    "response" : {
+      "type" : "dev.crain.employees.v1.EmployeeRecord",
+      "many" : false
+    },
+    "credentials" : "OAUTH2_CLIENT",
+    "credentialsVia" : "BearerTokenAuthenticationInterceptor: an authorized client's token, from EmployeeServiceClient#employeeAsPayroll",
+    "registration" : {
+      "id" : "payroll-service",
+      "clientId" : "payroll-service",
+      "grantType" : "client_credentials",
+      "scopes" : [ "employees.read" ],
+      "tokenUri" : "http://localhost:9000/oauth2/token"
+    }
+  }, {
+    "type" : "egress",
+    "id" : "egress:org.springframework.boot.security.oauth2.server.resource.autoconfigure.JwtDecoderConfiguration GET /.well-known/openid-configuration",
+    "client" : "JwtDecoder",
+    "httpMethod" : "GET",
+    "uriTemplate" : "/.well-known/openid-configuration",
+    "baseUrl" : "http://localhost:9000",
+    "callSite" : {
+      "className" : "org.springframework.boot.security.oauth2.server.resource.autoconfigure.JwtDecoderConfiguration"
+    },
+    "credentials" : "NONE"
+  }, {
+    "type" : "egress",
+    "id" : "egress:org.springframework.security.oauth2.client.registration.ClientRegistration POST /oauth2/token",
+    "client" : "OAuth2 client",
+    "httpMethod" : "POST",
+    "uriTemplate" : "/oauth2/token",
+    "baseUrl" : "http://localhost:9000",
+    "callSite" : {
+      "className" : "org.springframework.security.oauth2.client.registration.ClientRegistration"
+    },
+    "credentials" : "STATIC",
+    "credentialsVia" : "client registration"
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.email",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "email",
+    "jsonName" : "email",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.firstName",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "firstName",
+    "jsonName" : "firstName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.lastName",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "lastName",
+    "jsonName" : "lastName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.employees.v1.EmployeeRecord.salary",
+    "owner" : "dev.crain.employees.v1.EmployeeRecord",
+    "name" : "salary",
+    "jsonName" : "salary",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.PayrollChange.at",
+    "owner" : "dev.crain.payrollservice.payroll.PayrollChange",
+    "name" : "at",
+    "jsonName" : "at",
+    "javaType" : "java.time.Instant",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.PayrollChange.changedBy",
+    "owner" : "dev.crain.payrollservice.payroll.PayrollChange",
+    "name" : "changedBy",
+    "jsonName" : "changedBy",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.PayrollChange.current",
+    "owner" : "dev.crain.payrollservice.payroll.PayrollChange",
+    "name" : "current",
+    "jsonName" : "current",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.PayrollChange.employeeId",
+    "owner" : "dev.crain.payrollservice.payroll.PayrollChange",
+    "name" : "employeeId",
+    "jsonName" : "employeeId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.PayrollChange.employeeName",
+    "owner" : "dev.crain.payrollservice.payroll.PayrollChange",
+    "name" : "employeeName",
+    "jsonName" : "employeeName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.PayrollChange.previous",
+    "owner" : "dev.crain.payrollservice.payroll.PayrollChange",
+    "name" : "previous",
+    "jsonName" : "previous",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.SalaryChange.at",
+    "owner" : "dev.crain.payrollservice.payroll.SalaryChange",
+    "name" : "at",
+    "jsonName" : "at",
+    "javaType" : "java.time.Instant",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.SalaryChange.changedBy",
+    "owner" : "dev.crain.payrollservice.payroll.SalaryChange",
+    "name" : "changedBy",
+    "jsonName" : "changedBy",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.SalaryChange.current",
+    "owner" : "dev.crain.payrollservice.payroll.SalaryChange",
+    "name" : "current",
+    "jsonName" : "current",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.SalaryChange.employeeId",
+    "owner" : "dev.crain.payrollservice.payroll.SalaryChange",
+    "name" : "employeeId",
+    "jsonName" : "employeeId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.payroll.SalaryChange.previous",
+    "owner" : "dev.crain.payrollservice.payroll.SalaryChange",
+    "name" : "previous",
+    "jsonName" : "previous",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.PayrollView.headcount",
+    "owner" : "dev.crain.payrollservice.team.PayrollView",
+    "name" : "headcount",
+    "jsonName" : "headcount",
+    "javaType" : "int",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.PayrollView.teamId",
+    "owner" : "dev.crain.payrollservice.team.PayrollView",
+    "name" : "teamId",
+    "jsonName" : "teamId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.PayrollView.total",
+    "owner" : "dev.crain.payrollservice.team.PayrollView",
+    "name" : "total",
+    "jsonName" : "total",
+    "javaType" : "java.math.BigDecimal",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.Team.id",
+    "owner" : "dev.crain.payrollservice.team.Team",
+    "name" : "id",
+    "jsonName" : "id",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.Team.memberIds",
+    "owner" : "dev.crain.payrollservice.team.Team",
+    "name" : "memberIds",
+    "jsonName" : "memberIds",
+    "javaType" : "java.util.List",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.Team.name",
+    "owner" : "dev.crain.payrollservice.team.Team",
+    "name" : "name",
+    "jsonName" : "name",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.Team.visibility",
+    "owner" : "dev.crain.payrollservice.team.Team",
+    "name" : "visibility",
+    "jsonName" : "visibility",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamSummary.name",
+    "owner" : "dev.crain.payrollservice.team.TeamSummary",
+    "name" : "name",
+    "jsonName" : "name",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamSummary.teamId",
+    "owner" : "dev.crain.payrollservice.team.TeamSummary",
+    "name" : "teamId",
+    "jsonName" : "teamId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamSummary.visibility",
+    "owner" : "dev.crain.payrollservice.team.TeamSummary",
+    "name" : "visibility",
+    "jsonName" : "visibility",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamView.leadEmail",
+    "owner" : "dev.crain.payrollservice.team.TeamView",
+    "name" : "leadEmail",
+    "jsonName" : "leadEmail",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamView.leadName",
+    "owner" : "dev.crain.payrollservice.team.TeamView",
+    "name" : "leadName",
+    "jsonName" : "leadName",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamView.name",
+    "owner" : "dev.crain.payrollservice.team.TeamView",
+    "name" : "name",
+    "jsonName" : "name",
+    "javaType" : "java.lang.String",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamView.size",
+    "owner" : "dev.crain.payrollservice.team.TeamView",
+    "name" : "size",
+    "jsonName" : "size",
+    "javaType" : "int",
+    "declassified" : false
+  }, {
+    "type" : "field",
+    "id" : "field:dev.crain.payrollservice.team.TeamView.teamId",
+    "owner" : "dev.crain.payrollservice.team.TeamView",
+    "name" : "teamId",
+    "jsonName" : "teamId",
+    "javaType" : "long",
+    "declassified" : false
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /actuator/health",
+    "httpMethod" : "GET",
+    "route" : "/actuator/health",
+    "handler" : {
+      "className" : "org.springframework.boot.health.actuate.endpoint.HealthEndpoint",
+      "method" : "health()"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /actuator/health/{*path}",
+    "httpMethod" : "GET",
+    "route" : "/actuator/health/{*path}",
+    "handler" : {
+      "className" : "org.springframework.boot.health.actuate.endpoint.HealthEndpoint",
+      "method" : "healthForPath(java.lang.String[])"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /directory/teams",
+    "httpMethod" : "GET",
+    "route" : "/directory/teams",
+    "handler" : {
+      "className" : "dev.crain.payrollservice.directory.DirectoryHandler",
+      "method" : "teams(org.springframework.web.reactive.function.server.ServerRequest)"
+    },
+    "response" : {
+      "type" : "dev.crain.payrollservice.team.TeamSummary",
+      "many" : true
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /payroll/changes",
+    "httpMethod" : "GET",
+    "route" : "/payroll/changes",
+    "handler" : {
+      "className" : "dev.crain.payrollservice.payroll.PayrollController",
+      "method" : "changes(java.security.Principal)"
+    },
+    "response" : {
+      "type" : "dev.crain.payrollservice.payroll.PayrollChange",
+      "many" : true
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /teams/{id}",
+    "httpMethod" : "GET",
+    "route" : "/teams/{id}",
+    "handler" : {
+      "className" : "dev.crain.payrollservice.team.TeamController",
+      "method" : "get(long,java.security.Principal)"
+    },
+    "response" : {
+      "type" : "dev.crain.payrollservice.team.TeamView",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /teams/{id}/payroll",
+    "httpMethod" : "GET",
+    "route" : "/teams/{id}/payroll",
+    "handler" : {
+      "className" : "dev.crain.payrollservice.team.TeamController",
+      "method" : "payroll(long,java.security.Principal)"
+    },
+    "response" : {
+      "type" : "dev.crain.payrollservice.team.PayrollView",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:KAFKA employee.salary-changed",
+    "httpMethod" : "KAFKA",
+    "route" : "employee.salary-changed",
+    "handler" : {
+      "className" : "dev.crain.payrollservice.payroll.SalaryChangeListener",
+      "method" : "salaryChanged(dev.crain.payrollservice.payroll.SalaryChange)"
+    },
+    "request" : {
+      "type" : "dev.crain.payrollservice.payroll.SalaryChange",
+      "many" : false
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "httpMethod" : "POST",
+    "route" : "/teams/{id}/members/{employeeId}",
+    "handler" : {
+      "className" : "dev.crain.payrollservice.team.TeamController",
+      "method" : "addMember(long,long,java.security.Principal)"
+    },
+    "response" : {
+      "type" : "dev.crain.payrollservice.team.TeamSummary",
+      "many" : false
+    }
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):0:/actuator/health",
+    "mechanism" : "authorizeExchange",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "PERMIT_ALL"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter)",
+      "line" : 29
+    },
+    "routePattern" : "/actuator/health",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):1:/teams/*/payroll,/payroll/**",
+    "mechanism" : "authorizeExchange",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "hasRole(ADMIN)"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter)",
+      "line" : 30
+    },
+    "routePattern" : "/teams/*/payroll,/payroll/**",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):2:POST /teams/**",
+    "mechanism" : "authorizeExchange",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_employees.write" ],
+      "expression" : "hasAuthority(SCOPE_employees.write)"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter)",
+      "line" : 31
+    },
+    "routePattern" : "POST /teams/**",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):3:/teams/**,/directory/**",
+    "mechanism" : "authorizeExchange",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_employees.read" ],
+      "expression" : "hasAuthority(SCOPE_employees.read)"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter)",
+      "line" : 32
+    },
+    "routePattern" : "/teams/**,/directory/**",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):4:anyExchange",
+    "mechanism" : "authorizeExchange",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "AUTHENTICATED"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.security.SecurityConfig",
+      "method" : "apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter)",
+      "line" : 33
+    },
+    "routePattern" : "anyExchange",
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.payrollservice.payroll.PayrollLedger#changes():@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "hasRole('ADMIN')"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.payroll.PayrollLedger",
+      "method" : "changes()"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.payrollservice.team.TeamService#addMember(long,long):@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "hasRole('ADMIN')"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.team.TeamService",
+      "method" : "addMember(long,long)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.payrollservice.team.TeamService#directory():@PostFilter",
+    "mechanism" : "@PostFilter",
+    "scope" : "METHOD",
+    "phase" : "POST",
+    "requirement" : {
+      "kind" : "OR",
+      "operands" : [ {
+        "kind" : "EXPRESSION",
+        "expression" : "(filterObject.visibility() == 'PUBLIC')"
+      }, {
+        "kind" : "ANY_AUTHORITY",
+        "authorities" : [ "ROLE_ADMIN" ]
+      } ],
+      "expression" : "filterObject.visibility() == 'PUBLIC' or hasRole('ADMIN')"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.team.TeamService",
+      "method" : "directory()"
+    },
+    "denial" : {
+      "kind" : "FILTER"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.payrollservice.team.TeamService#find(long):@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_employees.read" ],
+      "expression" : "hasAuthority('SCOPE_employees.read')"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.team.TeamService",
+      "method" : "find(long)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  }, {
+    "type" : "location",
+    "id" : "location:METHOD:dev.crain.payrollservice.team.TeamService#payroll(long):@PreAuthorize",
+    "mechanism" : "@PreAuthorize",
+    "scope" : "METHOD",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "ROLE_ADMIN" ],
+      "expression" : "hasRole('ADMIN')"
+    },
+    "target" : {
+      "className" : "dev.crain.payrollservice.team.TeamService",
+      "method" : "payroll(long)"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : true
+  } ],
+  "edges" : [ {
+    "from" : "ingress:GET /actuator/health",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):0:/actuator/health",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /actuator/health",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /actuator/health/{*path}",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):4:anyExchange",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /actuator/health/{*path}",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /directory/teams",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):3:/teams/**,/directory/**",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /directory/teams",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):3:/teams/**,/directory/**",
+    "to" : "location:METHOD:dev.crain.payrollservice.team.TeamService#directory():@PostFilter",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /directory/teams",
+    "order" : 2,
+    "via" : [ "dev.crain.payrollservice.directory.DirectoryHandler#teams(org.springframework.web.reactive.function.server.ServerRequest)", "dev.crain.payrollservice.team.TeamService#directory()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /payroll/changes",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):1:/teams/*/payroll,/payroll/**",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /payroll/changes",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):1:/teams/*/payroll,/payroll/**",
+    "to" : "location:METHOD:dev.crain.payrollservice.payroll.PayrollLedger#changes():@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /payroll/changes",
+    "order" : 2,
+    "via" : [ "dev.crain.payrollservice.payroll.PayrollController#changes(java.security.Principal)", "dev.crain.payrollservice.payroll.PayrollLedger#changes()" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /teams/{id}",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):3:/teams/**,/directory/**",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /teams/{id}",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):3:/teams/**,/directory/**",
+    "to" : "location:METHOD:dev.crain.payrollservice.team.TeamService#find(long):@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /teams/{id}",
+    "order" : 2,
+    "via" : [ "dev.crain.payrollservice.team.TeamController#get(long,java.security.Principal)", "dev.crain.payrollservice.team.TeamService#find(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.payrollservice.team.TeamService#find(long):@PreAuthorize",
+    "to" : "egress:dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employee(long) GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /teams/{id}",
+    "order" : 3,
+    "via" : [ "dev.crain.payrollservice.team.TeamController#get(long,java.security.Principal)", "dev.crain.payrollservice.team.TeamService#find(long)", "dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employee(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /teams/{id}/payroll",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):1:/teams/*/payroll,/payroll/**",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /teams/{id}/payroll",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):1:/teams/*/payroll,/payroll/**",
+    "to" : "location:METHOD:dev.crain.payrollservice.team.TeamService#payroll(long):@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /teams/{id}/payroll",
+    "order" : 2,
+    "via" : [ "dev.crain.payrollservice.team.TeamController#payroll(long,java.security.Principal)", "dev.crain.payrollservice.team.TeamService#payroll(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:METHOD:dev.crain.payrollservice.team.TeamService#payroll(long):@PreAuthorize",
+    "to" : "egress:dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employee(long) GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /teams/{id}/payroll",
+    "order" : 3,
+    "via" : [ "dev.crain.payrollservice.team.TeamController#payroll(long,java.security.Principal)", "dev.crain.payrollservice.team.TeamService#payroll(long)", "dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employee(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:KAFKA employee.salary-changed",
+    "to" : "egress:dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employeeAsPayroll(long) GRPC employees.v1.EmployeeDirectory/GetEmployee",
+    "kind" : "LOCAL",
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "order" : 1,
+    "via" : [ "dev.crain.payrollservice.payroll.SalaryChangeListener#salaryChanged(dev.crain.payrollservice.payroll.SalaryChange)", "dev.crain.payrollservice.employeeservice.EmployeeServiceClient#employeeAsPayroll(long)" ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "to" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):2:POST /teams/**",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "location:HTTP_REQUEST:dev.crain.payrollservice.security.SecurityConfig#apiSecurity(org.springframework.security.config.web.server.ServerHttpSecurity,org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter):2:POST /teams/**",
+    "to" : "location:METHOD:dev.crain.payrollservice.team.TeamService#addMember(long,long):@PreAuthorize",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "order" : 2,
+    "via" : [ "dev.crain.payrollservice.team.TeamController#addMember(long,long,java.security.Principal)", "dev.crain.payrollservice.team.TeamService#addMember(long,long)" ],
+    "bidirectional" : false
+  } ],
+  "flows" : [ {
+    "path" : "ingress:GET /directory/teams",
+    "from" : "field:dev.crain.payrollservice.team.Team.name",
+    "to" : "field:dev.crain.payrollservice.team.TeamSummary.name",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /directory/teams",
+    "from" : "field:dev.crain.payrollservice.team.Team.id",
+    "to" : "field:dev.crain.payrollservice.team.TeamSummary.teamId",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /directory/teams",
+    "from" : "field:dev.crain.payrollservice.team.Team.visibility",
+    "to" : "field:dev.crain.payrollservice.team.TeamSummary.visibility",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}",
+    "from" : "field:dev.crain.employees.v1.EmployeeRecord.email",
+    "to" : "field:dev.crain.payrollservice.team.TeamView.leadEmail",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}",
+    "from" : "field:dev.crain.employees.v1.EmployeeRecord.firstName",
+    "to" : "field:dev.crain.payrollservice.team.TeamView.leadName",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}",
+    "from" : "field:dev.crain.employees.v1.EmployeeRecord.lastName",
+    "to" : "field:dev.crain.payrollservice.team.TeamView.leadName",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}",
+    "from" : "field:dev.crain.payrollservice.team.Team.name",
+    "to" : "field:dev.crain.payrollservice.team.TeamView.name",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}",
+    "from" : "field:dev.crain.payrollservice.team.Team.memberIds",
+    "to" : "field:dev.crain.payrollservice.team.TeamView.size",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}",
+    "from" : "field:dev.crain.payrollservice.team.Team.id",
+    "to" : "field:dev.crain.payrollservice.team.TeamView.teamId",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}/payroll",
+    "from" : "field:dev.crain.payrollservice.team.Team.memberIds",
+    "to" : "field:dev.crain.payrollservice.team.PayrollView.headcount",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}/payroll",
+    "from" : "field:dev.crain.payrollservice.team.Team.id",
+    "to" : "field:dev.crain.payrollservice.team.PayrollView.teamId",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:GET /teams/{id}/payroll",
+    "from" : "field:dev.crain.employees.v1.EmployeeRecord.salary",
+    "to" : "field:dev.crain.payrollservice.team.PayrollView.total",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.payrollservice.payroll.SalaryChange.at",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.at",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.payrollservice.payroll.SalaryChange.changedBy",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.changedBy",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.payrollservice.payroll.SalaryChange.current",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.current",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.payrollservice.payroll.SalaryChange.employeeId",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.employeeId",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.employees.v1.EmployeeRecord.firstName",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.employeeName",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.employees.v1.EmployeeRecord.lastName",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.employeeName",
+    "source" : "COMPUTED",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:KAFKA employee.salary-changed",
+    "from" : "field:dev.crain.payrollservice.payroll.SalaryChange.previous",
+    "to" : "field:dev.crain.payrollservice.payroll.PayrollChange.previous",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "from" : "field:dev.crain.payrollservice.team.Team.name",
+    "to" : "field:dev.crain.payrollservice.team.TeamSummary.name",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "from" : "field:dev.crain.payrollservice.team.Team.id",
+    "to" : "field:dev.crain.payrollservice.team.TeamSummary.teamId",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  }, {
+    "path" : "ingress:POST /teams/{id}/members/{employeeId}",
+    "from" : "field:dev.crain.payrollservice.team.Team.visibility",
+    "to" : "field:dev.crain.payrollservice.team.TeamSummary.visibility",
+    "source" : "DIRECT",
+    "kind" : "LOCAL"
+  } ],
+  "provided" : [ ],
+  "findings" : [ ]
+}

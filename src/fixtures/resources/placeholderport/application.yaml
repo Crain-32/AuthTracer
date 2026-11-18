@@ -1,0 +1,6 @@
+server:
+  port: ${PORT:${FALLBACK_PORT:8443}}
+management:
+  server:
+    port: ${MANAGEMENT_PORT:${management.port}}
+  port: 9090

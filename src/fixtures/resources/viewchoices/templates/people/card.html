@@ -1,0 +1,8 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div sec:authorize="hasRole('ADMIN')">
+  <span th:text="${person.ssn}">ssn</span>
+</div>
+<p data-sec-authorize="hasRole('AUDITOR')" data-th-text="${person.ssn}">ssn</p>
+</body>
+</html>

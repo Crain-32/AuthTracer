@@ -1,0 +1,280 @@
+{
+  "schemaVersion" : 1,
+  "service" : "identity-service",
+  "revision" : "golden",
+  "port" : 9000,
+  "authoritySource" : {
+    "kind" : "USER_DETAILS",
+    "freshness" : "SNAPSHOT",
+    "detail" : "Form login (session), HTTP Basic"
+  },
+  "nodes" : [ {
+    "type" : "ingress",
+    "id" : "ingress:GET /.well-known/oauth-authorization-server",
+    "httpMethod" : "GET",
+    "route" : "/.well-known/oauth-authorization-server",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationServerMetadataEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /.well-known/openid-configuration",
+    "httpMethod" : "GET",
+    "route" : "/.well-known/openid-configuration",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.oidc.web.OidcProviderConfigurationEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /connect/logout",
+    "httpMethod" : "GET",
+    "route" : "/connect/logout",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.oidc.web.OidcLogoutEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /oauth2/authorize",
+    "httpMethod" : "GET",
+    "route" : "/oauth2/authorize",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /oauth2/jwks",
+    "httpMethod" : "GET",
+    "route" : "/oauth2/jwks",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.NimbusJwkSetEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:GET /userinfo",
+    "httpMethod" : "GET",
+    "route" : "/userinfo",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.oidc.web.OidcUserInfoEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /connect/logout",
+    "httpMethod" : "POST",
+    "route" : "/connect/logout",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.oidc.web.OidcLogoutEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /oauth2/authorize",
+    "httpMethod" : "POST",
+    "route" : "/oauth2/authorize",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /oauth2/introspect",
+    "httpMethod" : "POST",
+    "route" : "/oauth2/introspect",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.OAuth2TokenIntrospectionEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /oauth2/revoke",
+    "httpMethod" : "POST",
+    "route" : "/oauth2/revoke",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.OAuth2TokenRevocationEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /oauth2/token",
+    "httpMethod" : "POST",
+    "route" : "/oauth2/token",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.web.OAuth2TokenEndpointFilter"
+    }
+  }, {
+    "type" : "ingress",
+    "id" : "ingress:POST /userinfo",
+    "httpMethod" : "POST",
+    "route" : "/userinfo",
+    "handler" : {
+      "className" : "org.springframework.security.oauth2.server.authorization.oidc.web.OidcUserInfoEndpointFilter"
+    }
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:authorization-server:anyone",
+    "mechanism" : "OAuth2 Authorization Server (public: answers before authorization)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "PERMIT_ALL"
+    },
+    "target" : {
+      "className" : "org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:authorization-server:client",
+    "mechanism" : "OAuth2 Authorization Server (authenticated client)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "AUTHENTICATED"
+    },
+    "target" : {
+      "className" : "org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:authorization-server:scope_openid",
+    "mechanism" : "OAuth2 Authorization Server (bearer token)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "ANY_AUTHORITY",
+      "authorities" : [ "SCOPE_openid" ]
+    },
+    "target" : {
+      "className" : "org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  }, {
+    "type" : "location",
+    "id" : "location:HTTP_REQUEST:authorization-server:user",
+    "mechanism" : "OAuth2 Authorization Server (signed-in user)",
+    "scope" : "HTTP_REQUEST",
+    "phase" : "PRE",
+    "requirement" : {
+      "kind" : "AUTHENTICATED"
+    },
+    "target" : {
+      "className" : "org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer"
+    },
+    "denial" : {
+      "kind" : "THROW"
+    },
+    "proxied" : false
+  } ],
+  "edges" : [ {
+    "from" : "ingress:GET /.well-known/oauth-authorization-server",
+    "to" : "location:HTTP_REQUEST:authorization-server:anyone",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /.well-known/oauth-authorization-server",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /.well-known/openid-configuration",
+    "to" : "location:HTTP_REQUEST:authorization-server:anyone",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /.well-known/openid-configuration",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /connect/logout",
+    "to" : "location:HTTP_REQUEST:authorization-server:anyone",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /connect/logout",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /oauth2/authorize",
+    "to" : "location:HTTP_REQUEST:authorization-server:user",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /oauth2/authorize",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /oauth2/jwks",
+    "to" : "location:HTTP_REQUEST:authorization-server:anyone",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /oauth2/jwks",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:GET /userinfo",
+    "to" : "location:HTTP_REQUEST:authorization-server:scope_openid",
+    "kind" : "LOCAL",
+    "path" : "ingress:GET /userinfo",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /connect/logout",
+    "to" : "location:HTTP_REQUEST:authorization-server:anyone",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /connect/logout",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /oauth2/authorize",
+    "to" : "location:HTTP_REQUEST:authorization-server:user",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /oauth2/authorize",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /oauth2/introspect",
+    "to" : "location:HTTP_REQUEST:authorization-server:client",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /oauth2/introspect",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /oauth2/revoke",
+    "to" : "location:HTTP_REQUEST:authorization-server:client",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /oauth2/revoke",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /oauth2/token",
+    "to" : "location:HTTP_REQUEST:authorization-server:client",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /oauth2/token",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  }, {
+    "from" : "ingress:POST /userinfo",
+    "to" : "location:HTTP_REQUEST:authorization-server:scope_openid",
+    "kind" : "LOCAL",
+    "path" : "ingress:POST /userinfo",
+    "order" : 1,
+    "via" : [ ],
+    "bidirectional" : false
+  } ],
+  "flows" : [ ],
+  "provided" : [ ],
+  "findings" : [ ],
+  "issuer" : {
+    "clients" : {
+      "authtracer-driver" : [ "employees.read", "employees.write", "openid", "profile" ],
+      "payroll-service" : [ "employees.read" ]
+    },
+    "claims" : [ "roles" ]
+  }
+}

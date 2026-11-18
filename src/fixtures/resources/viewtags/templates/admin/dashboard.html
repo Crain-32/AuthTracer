@@ -1,0 +1,16 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<h1 th:text="${report.title}">Title</h1>
+<div sec:authorize-url="/admin/users">
+  <span th:text="${report.headcount}">0</span>
+</div>
+<div sec:authorize-url="POST /admin/purge">
+  <span th:text="${report.purged}">0</span>
+</div>
+<div sec:authorize-url="/public/news">
+  <span th:text="${report.news}">news</span>
+</div>
+<p sec:authorize-acl="${report} :: 'READ,WRITE'" th:text="${report.notes}">notes</p>
+<div th:text="${band.top}">top</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+// The grpcrelay fixture's service. Its messages are generated into the fixture's package, so they are the
+// application's own, as a service's generated code is.
+package fixtures.grpcrelay;
+
+option java_multiple_files = true;
+
+service Relay {
+  rpc Greet (GreetRequest) returns (GreetReply);
+  rpc Ping (GreetRequest) returns (GreetReply);
+}
+
+message GreetRequest {
+  string name = 1;
+}
+
+message GreetReply {
+  string message = 1;
+  string secret_note = 2;
+}

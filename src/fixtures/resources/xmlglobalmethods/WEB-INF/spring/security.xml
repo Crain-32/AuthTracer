@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">
+    <http>
+        <intercept-url pattern="/**" access="authenticated"/>
+        <http-basic/>
+    </http>
+    <!-- Legacy: an enabled annotation comes first; a method without one gets the pointcut's attributes. -->
+    <global-method-security pre-post-annotations="enabled">
+        <protect-pointcut expression="execution(* fixtures.xmlglobalmethods.Payroll.*(..))"
+                          access="ROLE_PAYROLL, ROLE_HR"/>
+    </global-method-security>
+</b:beans>

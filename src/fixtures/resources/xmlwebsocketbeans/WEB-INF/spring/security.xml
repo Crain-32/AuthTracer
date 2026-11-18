@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                             http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">
+    <http>
+        <intercept-url pattern="/**" access="authenticated"/>
+        <http-basic/>
+    </http>
+    <!-- Each runs on the inbound channel: a manager bean of the XML's, and one defined nowhere AuthTracer looks. -->
+    <websocket-message-broker authorization-manager-ref="opsManager"/>
+    <websocket-message-broker authorization-manager-ref="missingManager"/>
+    <!-- The Java configuration may give the channel this one. -->
+    <websocket-message-broker id="manualSecurity">
+        <intercept-message pattern="/**" access="denyAll"/>
+    </websocket-message-broker>
+    <b:bean id="opsManager" class="fixtures.xmlwebsocketbeans.OpsMessageManager"/>
+</b:beans>

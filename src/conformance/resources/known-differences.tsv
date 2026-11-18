@@ -1,0 +1,95 @@
+# Disagreements between a fixture's graph and Spring that are understood (ConformanceTests). Tab-separated:
+# fixture, endpoint (GET /path, or * for all), caller label prefix (or *), why they differ.
+
+# Work on another thread that nobody waits for (decisions 0062, 0084, draft 0102): the request answers 200 and the
+# check denies the work on its thread. The graph counts the check for the endpoint, since it guards what it does.
+asyncexecutorsdecorated	POST /given	lacks	Off-thread work with the caller's context (a decorated @Async executor), not waited for: 200, the work is denied there (draft 0102)
+asyncexecutorsdecorated	POST /pooled	lacks	Off-thread work with the caller's context (a decorated @Async executor), not waited for: 200, the work is denied there (draft 0102)
+asyncpropagated	DELETE /notifications	lacks	Off-thread work with the caller's context (@Async, propagated), not waited for: 200, the work is denied there (draft 0102)
+threadhopsdelegating	GET /submitted	lacks	Off-thread work with the caller's context (a DelegatingSecurityContext executor), not waited for: 200, the work is denied there (draft 0102)
+threadhopsholderstrategy	POST /refresh	lacks	Off-thread work with the caller's context (the inheritable strategy), not waited for: 200, the work is denied there (draft 0102)
+threadhopsholderstrategy	POST /thread	lacks	Off-thread work with the caller's context (the inheritable strategy), not waited for: 200, the work is denied there (draft 0102)
+threadhopsinherited	POST /thread	lacks	Off-thread work with the caller's context (the inheritable strategy), not waited for: 200, the work is denied there (draft 0102)
+threadhopsdecorated	GET /decorated	lacks	Off-thread work with the caller's context (a TaskDecorator on Boot's executor), not waited for: 200, the work is denied there (draft 0102)
+threadhopsdecorators	POST /refresh	lacks	Off-thread work with the caller's context (a TaskDecorator on Boot's executor), not waited for: 200, the work is denied there (draft 0102)
+threadhopspooled	*	lacks	Off-thread work on pooled threads, not waited for: 200, the work is denied there with whatever context the thread kept (draft 0102)
+threadhopspooled	GET /supply	meets all	The pooled thread keeps the SecurityContext the inheritable strategy gave it when it was made, another request's (the AUTHORITIES_IN_CODE finding): Spring decides on that caller
+threadhopswaitedforms	POST /dropped	lacks	The future is dropped, not waited for (decision 0099): 200, the work is denied on its thread (draft 0102)
+
+# Checks whose denial the request doesn't see.
+programmaticchecks	GET /documents/{id}/draft	*	authorize(..) decides an early return (decision 0066): a denied caller gets 200 "not yours" and the work after it doesn't run (draft 0102)
+programmaticchecks	GET /drafts/{id}/delete	*	authorize(..) decides an early return (decision 0066): a denied caller gets 200 and the work after it doesn't run (draft 0102)
+authoritiesincode	POST /support/refunds/{id}	lacks	The handler sets a token with ROLE_BILLING before the check (AUTHORITIES_IN_CODE finding), which then decides on it, not the caller (draft 0101, BUGS.md 4)
+
+# A field check that throws fails the whole response, but the graph counts it for its field only (draft 0100,
+# BUGS.md 3). Hosted without security, the anonymous caller has no Authentication at all, which fails it too.
+jacksonnames	GET /person	anonymous	Serializing Person.ssn throws for this caller and fails the whole response (draft 0100)
+proxies	*	anonymous	Serializing the proxies' guarded getters throws for this caller and fails the whole response (draft 0100)
+builtproxies	*	anonymous	Serializing the built proxies' guarded getters throws for this caller and fails the whole response (draft 0100)
+builtproxiesonly	*	meets all	Serializing the invoice's guarded getters throws for this caller and fails the whole response (draft 0100)
+builtproxiesunread	*	anonymous	Serializing the proxies' guarded getters throws for this caller and fails the whole response (draft 0100)
+denials	GET /accounts/{id}	anonymous	Serializing Account's owner check (no denial handler) throws for this caller and fails the whole response (draft 0100)
+denials	GET /branches/{id}	anonymous	Serializing Branch.manager throws for this caller (@Secured has no denial handler) and fails the whole response (draft 0100)
+proxyadvisors	GET /accounts/{id}	anonymous	Serializing Account.email throws for this caller and fails the whole response (draft 0100)
+proxyadvisorscustomized	GET /accounts/{id}	anonymous	Serializing Account.email throws for this caller and fails the whole response (draft 0100)
+proxyflows	*	anonymous	Serializing the proxies' guarded getters throws for this caller and fails the whole response (draft 0100)
+fields	GET /cards/proxied	anonymous	Serializing Card.number throws for this caller and fails the whole response (draft 0100)
+fields	GET /statements/current	anonymous	Serializing Statement's guarded getters throws for this caller and fails the whole response (draft 0100)
+returnobjectsecured	GET /iban	meets all	The handler calls the proxied Account.getIban() itself: its @Secured check throws for this caller and fails the whole request, which the graph counts for the iban field only (draft 0100)
+
+# Hosted without security, nothing gives a caller who hasn't signed in an Authentication, and method interceptors throw
+# AuthenticationCredentialsNotFoundException even where the check admits anyone; the graph reads anonymous
+# authentication as a Servlet chain's (BUGS.md 5).
+fields	*	anonymous	No chain, so no anonymous Authentication: the getters' checks throw before their denial handlers answer null (BUGS.md 5)
+expressionhandler	GET /pager	anonymous	No chain, so no anonymous Authentication: @PreAuthorize("onCall()") throws although onCall() grants everyone (BUGS.md 5)
+permissionnone	GET /documents/{id}	anonymous	No chain, so no anonymous Authentication: the legacy interceptor throws although !hasPermission(..) grants everyone (BUGS.md 5)
+denials	GET /accounts/{id}/summary	anonymous	No chain, so no anonymous Authentication: the getIban() check the handler reads throws before LastFour answers (BUGS.md 5)
+
+# Rules AuthTracer can't read, or that depend on what the caller sends: the graph shows the weakest reading with an
+# OPAQUE_CONFIG or BYPASSED finding (decisions 0018, 0051, 0080, 0086), and the probe doesn't send what they match.
+customizerforms	*	anonymous	A RequestMatcher AuthTracer can't evaluate may take the request first (OPAQUE_CONFIG finding)
+dslhelpers	GET /home	anonymous	A RequestMatcher AuthTracer can't evaluate may take the request first (OPAQUE_CONFIG finding)
+dynamicmatchers	*	anonymous	Patterns that aren't constants, and a securityMatcher AuthTracer can't evaluate (OPAQUE_CONFIG findings)
+kotlindsl	*	anonymous	A RequestMatcher AuthTracer can't evaluate may take the request first (OPAQUE_CONFIG finding)
+matcherforms	*	anonymous	Rules that match on what the caller sends (a header, a parameter, how it writes the URI) or that AuthTracer can't evaluate (BYPASSED, OPAQUE_CONFIG findings)
+matcherlambdas	*	anonymous	Rules that match on what the caller sends (a header, a CORS preflight, how it writes the URI) or that AuthTracer can't evaluate (BYPASSED, OPAQUE_CONFIG findings)
+matcherlambdaforms	*	meets all	Rules that match on what the caller sends or that AuthTracer can't evaluate take the request before anyRequest (BYPASSED, OPAQUE_CONFIG findings)
+ignoringforms	GET /orders	anonymous	ignoring() when the caller sends a User-Agent header skips every chain (BYPASSED finding); the probe sends none
+permittedqueries	*	anonymous	The permitAll rule matches only with a query string the caller adds (BYPASSED finding); the probe sends none
+gateway	*	anonymous	Narrower rules match part of the route (decision 0080): the graph shows its weakest part, the probe's path gets the broader rule
+servlets	GET /**	anonymous	Narrower rules match part of the servlet's mapping (decision 0080): the graph shows its weakest part, the probe's path gets the broader rule
+variableroutes	GET /reports/{type}	anonymous	A narrower rule matches part of the route's paths (/reports/public-* takes /reports/public-q1): the graph shows its weakest part, the probe's path gets the broader rule
+servletmappings	GET /**	anonymous	Narrower rules match part of the servlet's mapping (decision 0080, 0112): the graph shows its weakest part, the probe's path gets the broader rule
+servletmappings	GET /**/*.csv	anonymous	Narrower rules match part of the servlet's mapping (decision 0080, 0112): the graph shows its weakest part, the probe's path gets the broader rule
+servletregistrations	* /**/*.metrics	anonymous	Narrower rules match part of the servlet's mapping (decision 0080, 0112): the graph shows its weakest part, the probe's path gets the broader rule
+servletregistrations	POST /**	anonymous	Narrower rules match part of the servlet's mapping (decision 0080, 0112): the graph shows its weakest part, the probe's path gets the broader rule
+servletregistrations	POST /**/*.do	anonymous	Narrower rules match part of the servlet's mapping (decision 0080, 0112): the graph shows its weakest part, the probe's path gets the broader rule
+branches	GET /cached/{id}	meets all	@PreAuthorize runs on some of the handler's branches only (decision 0027, BYPASSED finding); the probe takes the one that runs it
+branches	GET /peeked/{id}	meets all	@PreAuthorize runs on some of the handler's branches only (decision 0027); the parameters the probe fills in (archived=1) take the one that runs it
+advisors	GET /audit	anonymous	An advisor with a pointcut AuthTracer can't read guards AuditTrail (OPAQUE_CONFIG finding): the graph shows no check there
+customfactory	GET /admin/users	meets all	The application's own AuthorizationManagerFactory builds the rules (OPAQUE_CONFIG finding); the graph reads them as the DSL asks
+factoryhttp	*	meets all	The factory adds an authorization to every rule (setAdditionalAuthorization, OPAQUE_CONFIG finding), which the graph doesn't show
+basepathunread	GET /admin/users	meets all	The matcher builder's base path is computed (OPAQUE_CONFIG finding): rules are matched without it, so /admin/** misses
+jwkset	*	anonymous	Boot makes its resource server or its OAuth2 Login chain by the jars' classpath order (OPAQUE_CONFIG finding): the graph shows the resource server's, the booted fixture gets OAuth2 Login's
+
+# A check past the call walk's depth: the graph cuts the path there with an Opaque step and an OPAQUE_CALLPATH finding.
+deepcalls	GET /deep	meets all	The check is more than 40 calls deep, past what the walk follows: an Opaque step and an OPAQUE_CALLPATH finding stand for it
+
+# Hand-rolled checks count as no authorization (decisions 0006, 0015, 0072): an UNRECOGNIZED_CHECK finding each.
+handrolled	GET /legacy/manual	anonymous	A hand-rolled isUserInRole check denies (UNRECOGNIZED_CHECK finding)
+handrolledcorners	*	anonymous	A hand-rolled check denies (UNRECOGNIZED_CHECK finding)
+handrolledforms	GET /reports	anonymous	A hand-rolled check denies (UNRECOGNIZED_CHECK finding)
+handrolledreactive	GET /reactive/ping	anonymous	A hand-rolled WebFilter check denies (UNRECOGNIZED_CHECK finding)
+interceptors	*	meets all	A HandlerInterceptor's hand-rolled isUserInRole check denies (UNRECOGNIZED_CHECK finding)
+functionalfilters	GET /exports	meets all	A route filter's hand-rolled authorities check denies (UNRECOGNIZED_CHECK finding)
+
+# A call out that refuses the caller before it is made.
+grpcclient	GET /greetings/{name}	anonymous	The gRPC call relays the caller's token through TokenRelayTokenSupplier, which throws for a caller not signed in with OAuth2 Login; the graph doesn't read the relay as a check (BUGS.md 5)
+
+# What the harness can't make up.
+authserver	*	meets all	The OIDC UserInfo endpoint answers only for an access token its OAuth2AuthorizationService issued; a made-up caller has none
+authservercustom	*	meets all	The OIDC UserInfo endpoint answers only for an access token its OAuth2AuthorizationService issued; a made-up caller has none
+authserverproperties	*	meets all	The OIDC UserInfo endpoint answers only for an access token its OAuth2AuthorizationService issued; a made-up caller has none
+authserverunread	*	meets all	The OIDC UserInfo endpoint answers only for an access token its OAuth2AuthorizationService issued; a made-up caller has none
+
+# What the shared classpath answers in a fixture's place.

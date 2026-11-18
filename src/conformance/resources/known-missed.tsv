@@ -1,0 +1,7 @@
+# Mutants Spring lets more callers in for while the diff says nothing, understood (MutationTests). Tab-separated:
+# fixture, the mutation as mutants.tsv describes it, why the diff can't see it.
+
+# Decision 0120: a rule says what the library's annotation asks for, and AuthTracer takes its word. The aspect that
+# enforces it is the library's code, which nothing ties to the rule: the library changing what it enforces is the
+# rule's to keep true, as Spring Security's own code is AuthTracer's.
+customlibrary	PermissionAspect.check(): drop guard.require(required.value());	the rule for @RequiresPermission stands for the aspect that enforces it (decision 0120)

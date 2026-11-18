@@ -1,0 +1,7 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<table>
+  <tr th:each="o : ${listOwners}"><td><a th:href="@{/owners/{id}(id=${o.id})}" th:text="${o.lastName}"></a></td></tr>
+</table>
+</body>
+</html>

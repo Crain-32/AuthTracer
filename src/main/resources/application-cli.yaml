@@ -1,0 +1,4 @@
+# The CLI writes graphs to files and never uses the store; keep it off the server's database file (H2 locks it).
+spring:
+  datasource:
+    url: jdbc:h2:mem:authtracer-cli

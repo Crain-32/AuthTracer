@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://idp.example.com/jwks
+          authority-prefix: ROLE_
+          authorities-claim-expressions:
+            - "[realm_access][roles]"
+            - "[resource_access][orders][roles]"

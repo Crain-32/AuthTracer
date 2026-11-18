@@ -1,0 +1,55 @@
+{
+  "terminal": [
+    {
+      "id": "scan",
+      "step": "Step 1 \u00b7 Scan",
+      "heading": "Scan a service's compiled code. Nothing is run.",
+      "command": "./gradlew authtracer --args=\"scan --project examples/employee-service --out build/graphs/employee-service.json --publish http://localhost:8080\"",
+      "output": [
+        "INFO  ApplicationScanner - Scanned employee-service (45 application classes) in 496 ms: 67 nodes, 34 edges, 3 findings",
+        "INFO  CliRunner - Wrote employee-service graph (revision 52e6713) to build/graphs/employee-service.json",
+        "INFO  CliRunner - Published employee-service graph to http://localhost:8080/api/graphs"
+      ],
+      "seconds": 6
+    },
+    {
+      "id": "link",
+      "step": "Step 2 \u00b7 Link",
+      "heading": "Link the services, with what the traces saw.",
+      "command": "./gradlew authtracer --args=\"link --graphs build/graphs/profile-service.json,...,build/graphs/payroll-service.json --zipkin http://localhost:9411 --out build/graphs/system.json\"",
+      "output": [
+        "INFO  Linker - Linked 4 services: 11 links (7 observed), 34 network flows, 28 observations, 4 identities, 1 findings from 62 traces"
+      ],
+      "seconds": 5.5
+    },
+    {
+      "id": "diff",
+      "step": "Step 3 \u00b7 Check a pull request",
+      "heading": "A new endpoint reads employees without the checks.",
+      "command": "./gradlew authtracer --args=\"diff --project build/experiments/employee-service-shortcut --base-project examples/employee-service --context build/graphs/system.json --json shortcut.json\"",
+      "output": [
+        "!Result: **FAIL** (7 diagonal escalation, 2 new finding, 1 new exposure)",
+        "| FAIL | DIAGONAL_ESCALATION | employee-service | GET /directory/{id} | ssn | ROLE_ADMIN | authenticated |",
+        "| FAIL | DIAGONAL_ESCALATION | employee-service | GET /directory/{id} | salary | SCOPE_employees.read and any of [ROLE_ADMIN, ROLE_AUDITOR] | authenticated |",
+        "| REVIEW | NEW_FINDING | employee-service | Employee#getSsn() | BYPASSED |",
+        "..."
+      ],
+      "seconds": 6
+    }
+  ],
+  "first_service": {
+    "service": "employee-service",
+    "route": "/employees/{id}",
+    "caption": "One service: every endpoint with what it requires, and the checks on its path in the order they run."
+  },
+  "lineage": {
+    "endpoint": "profile-service GET /profiles/{id}",
+    "field": "ssnLast4",
+    "caption": "Where a response field comes from: profile-service's ssnLast4 is computed from employee-service's ssn, so it inherits the check on it."
+  },
+  "exposures": {
+    "filter": "ssn",
+    "caption": "What a caller needs for each endpoint and field, across every service on the way. Fields show what they ask beyond their endpoint."
+  },
+  "diff_caption": "The report puts failures first: one row per distinct change, with every place it applies."
+}

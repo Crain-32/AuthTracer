@@ -1,0 +1,12 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: identity-service
+  security:
+    oauth2:
+      authorizationserver:
+        # Fixed issuer so tokens always carry iss=http://localhost:9000, matching the
+        # issuer-uri that profile-service/employee-service use, regardless of the Host the request came in on.
+        issuer: http://localhost:9000

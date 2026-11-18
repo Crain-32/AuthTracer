@@ -1,0 +1,610 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'idea'
+    // Kotlin and Groovy compile only fixtures (src/fixtures/kotlin, src/fixtures/groovy); AuthTracer itself is Java.
+    id 'groovy'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.21'
+    // Opens Spring-annotated classes and their methods, as in a real Kotlin Spring application.
+    id 'org.jetbrains.kotlin.plugin.spring' version '2.3.21'
+    id 'org.springframework.boot' version '4.1.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+    // Generates the gRPC fixtures' stubs from src/fixtures/proto, as a real gRPC service's build does.
+    id 'com.google.protobuf' version '0.9.5'
+}
+
+group = 'dev.crain'
+version = '0.0.1-SNAPSHOT'
+description = 'AuthTracer'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+protobuf {
+    protoc { artifact = 'com.google.protobuf:protoc:4.35.1' }
+    plugins {
+        grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.83.1' }
+        grpckt { artifact = 'io.grpc:protoc-gen-grpc-kotlin:1.5.0:jdk8@jar' }
+    }
+    generateProtoTasks { all().configureEach { it.plugins { grpc {}; grpckt {} } } }
+}
+
+sourceSets {
+    // Small Spring Security applications the scanner is unit-tested against (src/fixtures/java, kotlin and groovy).
+    // Compiled, never run.
+    fixtures {
+    }
+    // The integration tests also scan the fixtures (RepeatableScansTests) through the unit tests' FixtureScans.
+    integrationTest {
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+    }
+    systemTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    // Boots the fixtures and asks Spring what each graph says about them (conformanceTest below). On the fixtures'
+    // own classpath, not AuthTracer's.
+    conformance {
+        compileClasspath += sourceSets.fixtures.output
+        runtimeClasspath += sourceSets.fixtures.output
+    }
+    // Benchmarks against a recorded baseline (perfTest below).
+    perfTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    // The Zipkin server is a tool AuthTracer queries, not a library it links against.
+    zipkinServer {
+        canBeConsumed = false
+        transitive = false
+    }
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    systemTestImplementation.extendsFrom testImplementation
+    systemTestRuntimeOnly.extendsFrom testRuntimeOnly
+    perfTestImplementation.extendsFrom testImplementation
+    perfTestRuntimeOnly.extendsFrom testRuntimeOnly
+    conformanceImplementation.extendsFrom fixturesImplementation
+    conformanceRuntimeOnly.extendsFrom fixturesRuntimeOnly
+}
+
+dependencies {
+    zipkinServer 'io.zipkin:zipkin-server:3.6.1:exec'
+    // Which features each class is needed for (guide/codebase/features.md is generated from them).
+    implementation project(':annotations')
+    // The scanner (scanner/): graphs, Provided facts and the scan itself.
+    implementation project(':scanner')
+    implementation 'org.springframework.boot:spring-boot-starter-jackson'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework:spring-web'
+    implementation 'org.springframework.boot:spring-boot-h2console'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2'
+
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-restclient'
+    fixturesImplementation 'org.springframework:spring-webflux'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
+    fixturesImplementation 'jakarta.annotation:jakarta.annotation-api'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
+    fixturesImplementation 'org.springframework:spring-tx'
+    fixturesImplementation 'org.aspectj:aspectjweaver'
+    // The aspects AspectJ method security hands its checks to (mode = AdviceMode.ASPECTJ).
+    fixturesImplementation 'org.springframework.security:spring-security-aspects'
+    fixturesImplementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    fixturesImplementation 'org.apache.groovy:groovy'
+    fixturesImplementation 'org.springframework.graphql:spring-graphql'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-grpc-server'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-grpc-client'
+    fixturesImplementation 'io.grpc:grpc-kotlin-stub'
+    // Lets Boot serve gRPC through the servlet container; the native-server fixtures opt out by property.
+    fixturesImplementation 'io.grpc:grpc-servlet-jakarta'
+    fixturesImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core'
+    fixturesImplementation 'org.springframework.data:spring-data-commons'
+    fixturesImplementation 'org.springframework.data:spring-data-jpa'
+    fixturesImplementation 'org.springframework.security:spring-security-data'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-websocket'
+    fixturesImplementation 'org.springframework.security:spring-security-messaging'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // OpenFeign's annotations and interceptor interface, for Feign client fixtures (decision 0042).
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-openfeign-core:5.0.0'
+    fixturesImplementation 'io.github.openfeign:feign-core:13.6'
+    // Spring Cloud Gateway's route DSL and filters, for gateway fixtures (decision 0043).
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-gateway-server-webflux:5.0.0'
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-gateway-server-webmvc:5.0.0'
+    // Message listeners and templates, for message-driven fixtures (decision 0044).
+    fixturesImplementation 'org.springframework.kafka:spring-kafka'
+    fixturesImplementation 'org.springframework.amqp:spring-rabbit'
+    fixturesImplementation 'org.springframework:spring-jms'
+    fixturesImplementation 'jakarta.jms:jakarta.jms-api'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-rsocket'
+    fixturesImplementation 'org.springframework.security:spring-security-rsocket'
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-stream:5.0.0'
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka:5.0.0'
+    // Spring Authorization Server, for its endpoints (decision 0049).
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-jersey'
+    fixturesImplementation 'org.springframework.boot:spring-boot-h2console'
+    fixturesImplementation 'com.h2database:h2'
+    fixturesImplementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-config-server:5.0.0'
+    fixturesImplementation 'org.springframework.boot:spring-boot-starter-webservices'
+    // WS-Security's interceptor, which authenticates SOAP messages (decision 0056). WSS4J's SAML support needs
+    // OpenSAML, which isn't on Maven Central; the fixtures don't use it.
+    fixturesImplementation('org.springframework.ws:spring-ws-security') {
+        exclude group: 'org.opensaml'
+    }
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-netflix-eureka-server:5.0.0'
+    fixturesImplementation 'org.springframework.cloud:spring-cloud-context:5.0.0'
+    // LDAP and CAS logins, for the authority source (decision 0074).
+    fixturesImplementation 'org.springframework.security:spring-security-ldap'
+    fixturesImplementation 'org.springframework.security:spring-security-cas'
+
+    // For CodebaseGuideTests, which reads every class's @Supports; the image's logger stays the image's.
+    testImplementation(project(':scanner-image')) {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+    testImplementation 'org.springframework.boot:spring-boot-starter-batch-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-cache-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-opentelemetry-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    // Weaves a fixture's classes as ajc would, for the scanner to read woven bytecode.
+    testImplementation 'org.aspectj:aspectjweaver'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // JMH measures the benchmarks (PerformanceTests runs them through its Runner); its annotation processor generates
+    // their harness.
+    perfTestImplementation 'org.openjdk.jmh:jmh-core:1.37'
+    perfTestAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+
+    // Callers made up for each probe, and a mock web environment to send them through.
+    conformanceImplementation 'org.springframework.security:spring-security-test'
+    conformanceImplementation 'org.springframework:spring-test'
+    // Spring Data's map store, for the repositories a fixture's own application would back with a store (StandInStore).
+    conformanceImplementation 'org.springframework.data:spring-data-keyvalue'
+    conformanceImplementation 'org.junit.jupiter:junit-jupiter'
+    // Boot's WebFlux auto-configuration, which a reactive fixture's application would have.
+    conformanceRuntimeOnly 'org.springframework.boot:spring-boot-webflux'
+    // What applications using the legacy access API add, which the fixtures name only in XML or annotations: without
+    // it those fixtures don't boot, and Spring can't be asked about them.
+    conformanceRuntimeOnly 'org.springframework.security:spring-security-access'
+    conformanceRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    dependsOn tasks.named('fixturesClasses')
+    // CodebaseGuideTests reads the guide, and -PupdateGuide=true rewrites its feature index.
+    inputs.dir('guide/codebase').withPropertyName('guide')
+    systemProperty 'authtracer.updateGuide', providers.gradleProperty('updateGuide').getOrElse('false')
+    def fixtureClasses = sourceSets.fixtures.output.classesDirs
+    def fixtureLibraries = sourceSets.fixtures.runtimeClasspath.filter { it.name.endsWith('.jar') }
+    doFirst {
+        systemProperty 'authtracer.fixtures.classes', fixtureClasses.asPath
+        systemProperty 'authtracer.fixtures.libraries', fixtureLibraries.asPath
+    }
+}
+
+// The directory holding the example services: this project's examples/, or -PservicesDir=<dir>.
+def servicesDir = providers.gradleProperty('servicesDir').map { file(it).absolutePath }.getOrElse(file('examples').absolutePath)
+
+// Scans the real example services in examples/ (the scan compiles them) against golden graphs.
+// ./gradlew integrationTest -PupdateGolden=true rewrites the goldens after an intended change.
+def integrationTest = tasks.register('integrationTest', Test) {
+    group = 'verification'
+    description = 'Scans the example services and compares against golden graphs.'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    shouldRunAfter tasks.named('test')
+    outputs.upToDateWhen { false }
+    systemProperty 'authtracer.services.dir', servicesDir
+    systemProperty 'authtracer.golden.dir', file('src/integrationTest/resources/golden').absolutePath
+    systemProperty 'authtracer.updateGolden', providers.gradleProperty('updateGolden').getOrElse('false')
+    dependsOn tasks.named('fixturesClasses')
+    maxHeapSize = '2g'
+    def fixtureClasses = sourceSets.fixtures.output.classesDirs
+    def fixtureLibraries = sourceSets.fixtures.runtimeClasspath.filter { it.name.endsWith('.jar') }
+    doFirst {
+        systemProperty 'authtracer.fixtures.classes', fixtureClasses.asPath
+        systemProperty 'authtracer.fixtures.libraries', fixtureLibraries.asPath
+    }
+}
+
+tasks.named('check') {
+    dependsOn integrationTest
+}
+
+// Worktrees under .claude/worktrees are whole copies of the project (node_modules and builds too): IntelliJ, which
+// takes its exclusions from here on a Gradle sync, shouldn't index them.
+idea {
+    module {
+        excludeDirs += file('.claude/worktrees')
+    }
+}
+
+// Test coverage: each test task records what it ran of AuthTracer's own code, and coverageReport merges the records of
+// the unit, integration and system tests that ran into build/reports/jacoco/coverageReport (html, xml, csv).
+tasks.withType(Test).configureEach {
+    jacoco {
+        includes = ['dev.crain.authtracer.*']
+    }
+    // G1 sizes its thread pools by the cores, and on a big machine they mostly spin: with four, the unit tests take a
+    // fifth less CPU and finish sooner (measured on 18 cores: 171 -> 134 cpu-s, 82 -> 71 s).
+    jvmArgs '-XX:ParallelGCThreads=4', '-XX:ConcGCThreads=1'
+}
+
+def coverageReport = tasks.register('coverageReport', JacocoReport) {
+    group = 'verification'
+    description = 'Merges the coverage of the unit, integration and system tests that ran into one report.'
+    mustRunAfter tasks.withType(Test)
+    sourceSets sourceSets.main, project(':scanner').sourceSets.main
+    executionData.from(files(['test', 'integrationTest', 'systemTest']
+            .collect { layout.buildDirectory.file("jacoco/${it}.exec") }).filter { it.exists() })
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
+    }
+}
+
+// The coverage floor `check` holds: what the unit and integration tests cover of the main code, a little under what
+// they reached when it was set (98.2% of lines, 90.0% of branches), and every class but the server's main mostly
+// covered. A new class without tests, or code that loses its tests, fails the build.
+def coverageCheck = tasks.register('coverageCheck', JacocoCoverageVerification) {
+    group = 'verification'
+    description = 'Fails when the unit and integration tests cover less of the main code than the floor.'
+    dependsOn tasks.named('test'), integrationTest
+    sourceSets sourceSets.main, project(':scanner').sourceSets.main
+    executionData.from(layout.buildDirectory.file('jacoco/test.exec'),
+            layout.buildDirectory.file('jacoco/integrationTest.exec'))
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.97
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.88
+            }
+        }
+        rule {
+            element = 'CLASS'
+            excludes = ['dev.crain.authtracer.AuthTracerApplication']
+            limit {
+                counter = 'LINE'
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn coverageCheck
+}
+
+// The UI (frontend/: React, TypeScript, Vite) is built into build/frontend/static, which joins the classpath of what
+// serves it: bootRun, the boot jar and the tests (which check it is served). Those need Node.js and npm on the PATH;
+// the command line and the pull-request check don't.
+def npmName = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? 'npm.cmd' : 'npm'
+// npm from the PATH, else where Homebrew and the Node installer put it: a Gradle daemon started from an IDE or another
+// tool may not have the shell's PATH. Its directory joins the PATH of the npm tasks, so the node it runs is found too.
+def npmDir = ((System.getenv('PATH') ?: '').split(File.pathSeparator).toList()
+        + ['/opt/homebrew/bin', '/usr/local/bin'])
+        .find { it && new File(it, npmName).canExecute() }
+def npm = npmDir ? new File(npmDir, npmName).absolutePath : npmName
+def npmPath = ([npmDir, System.getenv('PATH')].findAll { it }).join(File.pathSeparator)
+
+def frontendInstall = tasks.register('frontendInstall', Exec) {
+    group = 'build'
+    description = 'Installs the UI\'s npm dependencies, exactly as frontend/package-lock.json pins them.'
+    workingDir = file('frontend')
+    commandLine npm, 'ci', '--no-audit', '--no-fund'
+    environment 'PATH', npmPath
+    inputs.files('frontend/package.json', 'frontend/package-lock.json')
+    outputs.dir('frontend/node_modules')
+}
+
+def frontendBuild = tasks.register('frontendBuild', Exec) {
+    group = 'build'
+    description = 'Builds the UI into build/frontend/static.'
+    dependsOn frontendInstall
+    workingDir = file('frontend')
+    commandLine npm, 'run', 'build'
+    environment 'PATH', npmPath
+    inputs.dir('frontend/src')
+    inputs.dir('frontend/public')
+    inputs.files('frontend/index.html', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/package.json',
+            'frontend/package-lock.json')
+    outputs.dir(layout.buildDirectory.dir('frontend'))
+}
+
+def frontendTest = tasks.register('frontendTest', Exec) {
+    group = 'verification'
+    description = 'Runs the UI\'s unit tests (Vitest).'
+    dependsOn frontendInstall
+    workingDir = file('frontend')
+    commandLine npm, 'test'
+    environment 'PATH', npmPath
+    inputs.dir('frontend/src')
+    inputs.files('frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/package.json',
+            'frontend/package-lock.json')
+    def marker = layout.buildDirectory.file('frontend-test/passed')
+    outputs.file(marker)
+    doLast {
+        marker.get().asFile.parentFile.mkdirs()
+        marker.get().asFile.text = 'ok'
+    }
+}
+
+def frontendFiles = files(layout.buildDirectory.dir('frontend')).builtBy(frontendBuild)
+
+tasks.named('bootRun') {
+    classpath(frontendFiles)
+}
+
+tasks.named('bootJar') {
+    // Directories on a boot jar's classpath land in BOOT-INF/classes: the UI is static/ there.
+    classpath(frontendFiles)
+}
+
+tasks.named('test') {
+    classpath += frontendFiles
+}
+
+tasks.named('check') {
+    dependsOn frontendTest
+}
+
+// End to end: starts Zipkin and the example services (on shifted ports, so it can run next to a dev setup), drives
+// real traffic, then scans and links. Not part of `check`: it starts processes and takes about a minute.
+def serviceJars = ['profile-service', 'employee-service', 'identity-service', 'payroll-service'].collect { service ->
+    tasks.register("bootJar${service.split('-').collect { it.capitalize() }.join('')}", Exec) {
+        group = 'authtracer'
+        description = "Builds ${service}'s boot jar and plain jar (in examples/, or in -PservicesDir) for the system test."
+        workingDir = file("${servicesDir}/${service}")
+        commandLine './gradlew', '-q', 'bootJar', 'jar'
+    }
+}
+
+// The example services' Boot jars scan to their golden graphs too.
+integrationTest.configure {
+    dependsOn serviceJars
+}
+
+tasks.register('systemTest', Test) {
+    group = 'verification'
+    description = 'Runs AuthTracer against the running example services, their brokers (in Docker) and Zipkin.'
+    testClassesDirs = sourceSets.systemTest.output.classesDirs
+    classpath = sourceSets.systemTest.runtimeClasspath
+    useJUnitPlatform()
+    dependsOn serviceJars, 'zipkinJar', ':scanner-image:dockerImage'
+    outputs.upToDateWhen { false }
+    // Docker from the PATH Gradle was run with: a Gradle daemon keeps the PATH it started with, which may not have it.
+    environment 'PATH', providers.environmentVariable('PATH').getOrElse('')
+    systemProperty 'authtracer.services.dir', servicesDir
+    systemProperty 'authtracer.golden.dir', file('src/integrationTest/resources/golden').absolutePath
+    systemProperty 'authtracer.scanner.image', "authtracer-scanner:${project.version}"
+    systemProperty 'authtracer.zipkin.jar', layout.buildDirectory.file('tools/zipkin.jar').get().asFile.absolutePath
+    // Started with docker compose (not Testcontainers), as scripts/demo.sh does.
+    systemProperty 'authtracer.brokers.compose', file('scripts/brokers.compose.yaml').absolutePath
+}
+
+// Performance: how long the scan, link, exposures, diff and JSON take on fixed inputs (fixtures, the example services,
+// their golden graphs and recorded traces) and how much they allocate, as JMH measures them (PerformanceTests runs
+// each benchmark through JMH's Runner, forked with this task's JVM flags and system properties), and how big the UI
+// is, against src/perfTest/resources/baseline.json. Fails when one regressed past its tolerance; times are compared only on the
+// baseline's machine. ./gradlew perfTest -PupdatePerf=true records a new baseline. Not part of `check`: timings want a
+// quiet machine, and it takes a minute and a half.
+tasks.register('perfTest', Test) {
+    group = 'verification'
+    description = 'Benchmarks AuthTracer against the recorded baseline; the report is build/reports/perf/perf.md.'
+    testClassesDirs = sourceSets.perfTest.output.classesDirs
+    classpath = sourceSets.perfTest.runtimeClasspath
+    useJUnitPlatform()
+    dependsOn tasks.named('fixturesClasses'), frontendBuild
+    outputs.upToDateWhen { false }
+    // JaCoCo's agent slows the code it instruments, and a heap that doesn't resize keeps runs alike (JMH's forks take
+    // the same flags).
+    jacoco {
+        enabled = false
+    }
+    minHeapSize = '2g'
+    maxHeapSize = '2g'
+    testLogging {
+        showStandardStreams = true
+    }
+    systemProperty 'authtracer.services.dir', servicesDir
+    systemProperty 'authtracer.golden.dir', file('src/integrationTest/resources/golden').absolutePath
+    systemProperty 'authtracer.perf.traces',
+            file('src/integrationTest/resources/zipkin/example-services-traces.json').absolutePath
+    systemProperty 'authtracer.perf.baseline', file('src/perfTest/resources/baseline.json').absolutePath
+    systemProperty 'authtracer.perf.report', layout.buildDirectory.dir('reports/perf').get().asFile.absolutePath
+    systemProperty 'authtracer.perf.ui', layout.buildDirectory.dir('frontend/static').get().asFile.absolutePath
+    systemProperty 'authtracer.perf.update', providers.gradleProperty('updatePerf').getOrElse('false')
+    def fixtureClasses = sourceSets.fixtures.output.classesDirs
+    def fixtureLibraries = sourceSets.fixtures.runtimeClasspath.filter { it.name.endsWith('.jar') }
+    doFirst {
+        systemProperty 'authtracer.fixtures.classes', fixtureClasses.asPath
+        systemProperty 'authtracer.fixtures.libraries', fixtureLibraries.asPath
+    }
+}
+
+// Conformance: what each fixture's graph says a caller needs, checked against Spring. conformanceExpectations scans
+// every fixture and writes each endpoint's requirement (Exposures, as clauses); conformanceTest boots each fixture in a
+// mock web environment and sends every endpoint a caller that meets all of it, an anonymous one and, for each clause,
+// one that lacks only that clause. A disagreement fails unless src/conformance/resources/known-differences.tsv lists it
+// with a reason. The report is build/reports/conformance. Not part of `check`: it boots some 300 applications.
+def conformanceExpected = layout.buildDirectory.file('conformance/expected.tsv')
+def conformanceExpectations = tasks.register('conformanceExpectations', JavaExec) {
+    group = 'verification'
+    description = 'Writes what the graph of each fixture says each endpoint needs, for conformanceTest.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dev.crain.authtracer.conformance.ConformanceExpectations'
+    dependsOn tasks.named('fixturesClasses'), tasks.named('testClasses')
+    maxHeapSize = '2g'
+    args = [conformanceExpected.get().asFile.absolutePath, providers.gradleProperty('fixtures').getOrElse('all')]
+    outputs.file(conformanceExpected)
+    outputs.upToDateWhen { false }
+    def fixtureClasses = sourceSets.fixtures.output.classesDirs
+    def fixtureLibraries = sourceSets.fixtures.runtimeClasspath.filter { it.name.endsWith('.jar') }
+    doFirst {
+        systemProperty 'authtracer.fixtures.classes', fixtureClasses.asPath
+        systemProperty 'authtracer.fixtures.libraries', fixtureLibraries.asPath
+    }
+}
+tasks.register('conformanceTest', Test) {
+    group = 'verification'
+    description = 'Checks the graph of each fixture against Spring at runtime; the report is build/reports/conformance.'
+    testClassesDirs = sourceSets.conformance.output.classesDirs
+    classpath = sourceSets.conformance.runtimeClasspath
+    useJUnitPlatform()
+    dependsOn conformanceExpectations
+    shouldRunAfter tasks.named('test')
+    outputs.upToDateWhen { false }
+    jacoco {
+        enabled = false
+    }
+    maxHeapSize = '3g'
+    // What a booted fixture writes to a relative path (a log file it names, say) lands here, not in the project.
+    def work = layout.buildDirectory.dir('conformance/work').get().asFile
+    workingDir = work
+    doFirst {
+        work.mkdirs()
+    }
+    systemProperty 'authtracer.conformance.expected', conformanceExpected.get().asFile.absolutePath
+    systemProperty 'authtracer.conformance.resources', sourceSets.fixtures.output.resourcesDir.absolutePath
+    systemProperty 'authtracer.conformance.report', layout.buildDirectory.dir('reports/conformance').get().asFile.absolutePath
+}
+
+// Mutation testing: whether the diff flags what weakens authorization, judged by Spring. mutationMutants mutates each
+// Java fixture's sources the way pull requests weaken authorization (a method check dropped, a request rule loosened, a
+// matcher widened, ...), one change at a time, and compiles, scans and diffs each mutant against the fixture as it is;
+// mutationTest boots the fixture and each mutant, sends both the same callers and classifies each mutant: caught,
+// MISSED (Spring let in a caller it kept out before and the diff is silent), false alarm or equivalent. A miss fails
+// unless src/conformance/resources/known-missed.tsv lists it. -Pfixtures=a,b, -Poperators=DROP_RULE,... and
+// -PmutantsPerOperator=n (per fixture) limit it. The report is build/reports/mutation. Not part of `check`.
+def mutationDir = layout.buildDirectory.dir('mutation')
+def mutationMutants = tasks.register('mutationMutants', JavaExec) {
+    group = 'verification'
+    description = 'Mutates, compiles, scans and diffs each Java fixture, for mutationTest.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dev.crain.authtracer.mutation.MutationScans'
+    dependsOn tasks.named('fixturesClasses'), tasks.named('testClasses')
+    maxHeapSize = '3g'
+    args = [mutationDir.get().asFile.absolutePath, providers.gradleProperty('fixtures').getOrElse('all'),
+            providers.gradleProperty('operators').getOrElse('all'),
+            providers.gradleProperty('mutantsPerOperator').getOrElse('0')]
+    outputs.upToDateWhen { false }
+    def fixtureClasses = sourceSets.fixtures.output.classesDirs
+    def fixtureLibraries = sourceSets.fixtures.runtimeClasspath.filter { it.name.endsWith('.jar') }
+    doFirst {
+        systemProperty 'authtracer.fixtures.classes', fixtureClasses.asPath
+        systemProperty 'authtracer.fixtures.libraries', fixtureLibraries.asPath
+    }
+}
+tasks.register('mutationTest', Test) {
+    group = 'verification'
+    description = 'Boots each fixture mutant and asks Spring whether the diff missed a weakening; the report is build/reports/mutation.'
+    testClassesDirs = sourceSets.conformance.output.classesDirs
+    classpath = sourceSets.conformance.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching '*MutationTests'
+    }
+    dependsOn mutationMutants
+    outputs.upToDateWhen { false }
+    jacoco {
+        enabled = false
+    }
+    maxHeapSize = '3g'
+    // What a booted fixture writes to its working directory (a log file a property names) stays in build/.
+    def work = layout.buildDirectory.dir('mutation/work').get().asFile
+    workingDir = work
+    doFirst {
+        work.mkdirs()
+    }
+    systemProperty 'authtracer.mutation.dir', mutationDir.get().asFile.absolutePath
+    systemProperty 'authtracer.conformance.resources', sourceSets.fixtures.output.resourcesDir.absolutePath
+    systemProperty 'authtracer.mutation.report', layout.buildDirectory.dir('reports/mutation').get().asFile.absolutePath
+}
+
+tasks.register('authtracer', JavaExec) {
+    group = 'authtracer'
+    description = 'Runs the AuthTracer CLI, e.g. ./gradlew authtracer --args="scan --project examples/employee-service --out build/graphs/employee-service.json"'
+    classpath = sourceSets.main.runtimeClasspath.filter { !it.name.startsWith('spring-boot-devtools') }
+    mainClass = 'dev.crain.authtracer.cli.AuthTracerCli'
+    workingDir = projectDir
+}
+
+// The PR check: ./gradlew authtracerDiff -PdiffProject=examples/employee-service -PbaseRef=main [-Pcontext=build/graphs/system.json]
+// (or -PbaseProject=<dir> instead of -PbaseRef) [-Psarif=build/reports/authtracer/diff.sarif for PR annotations].
+// Fails the build when authorization got weaker.
+// Points the codebase guide's links at the lines their classes and members are declared on now (scripts/guide-anchors.sh
+// runs it). On demand, not on every build: lines move with nearly every edit.
+tasks.register('guideAnchors', JavaExec) {
+    group = 'documentation'
+    description = 'Points the links of guide/codebase (or the Markdown files given in --args) at their members\' lines.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dev.crain.authtracer.guide.GuideAnchors'
+    workingDir = projectDir
+}
+
+tasks.register('authtracerDiff', JavaExec) {
+    group = 'authtracer'
+    description = 'Diffs a project against a base revision and fails when authorization got weaker.'
+    classpath = sourceSets.main.runtimeClasspath.filter { !it.name.startsWith('spring-boot-devtools') }
+    mainClass = 'dev.crain.authtracer.cli.AuthTracerCli'
+    workingDir = projectDir
+    def option = { String name, String flag -> providers.gradleProperty(name).map { [flag, it] }.getOrElse([]) }
+    doFirst {
+        def target = providers.gradleProperty('diffProject').getOrNull()
+        if (target == null) {
+            throw new GradleException('Set -PdiffProject=<dir> and -PbaseRef=<git ref> or -PbaseProject=<dir>')
+        }
+        args(['diff', '--project', target] + option('baseRef', '--base-ref') + option('baseProject', '--base-project')
+                + option('headRef', '--head-ref') + option('context', '--context') + option('orgFacts', '--org-facts')
+                + option('sarif', '--sarif') + option('agentReport', '--agent-report')
+                + ['--report', providers.gradleProperty('report').getOrElse('build/reports/authtracer/diff.md')]
+                + option('failOnReview', '--fail-on-review'))
+    }
+}
+
+def zipkinJar = tasks.register('zipkinJar', Copy) {
+    group = 'authtracer'
+    description = 'Copies the Zipkin server jar to build/tools/zipkin.jar.'
+    from configurations.zipkinServer
+    into layout.buildDirectory.dir('tools')
+    rename { 'zipkin.jar' }
+}
+
+tasks.register('runZipkin', Exec) {
+    group = 'authtracer'
+    description = 'Runs the local Zipkin trace store on port 9411 (in-memory storage).'
+    dependsOn zipkinJar
+    def java = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+    def jar = layout.buildDirectory.file('tools/zipkin.jar')
+    doFirst {
+        commandLine java.get().executablePath.asFile.absolutePath, '-jar', jar.get().asFile.absolutePath
+    }
+}

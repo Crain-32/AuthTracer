@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+// The grpc fixture's service: a unary call, a server stream and a call nothing guards.
+package fixtures.grpc;
+
+option java_multiple_files = true;
+
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
+  rpc list_greetings (HelloRequest) returns (stream HelloReply);
+  rpc Ping (HelloRequest) returns (HelloReply);
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+// A repeated field has no getHistory(), only getHistoryList(); a field written in camel case has a
+// REPLYTOKEN_FIELD_NUMBER constant.
+message HelloReply {
+  string message = 1;
+  string secret_note = 2;
+  repeated Greeting history = 3;
+  string replyToken = 4;
+}
+
+message Greeting {
+  string text = 1;
+}

@@ -1,0 +1,11 @@
+// The annotations AuthTracer's code carries to say which features it is needed for (see guide/codebase). No
+// dependencies, so anything in the build can use them.
+plugins {
+    id 'java-library'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}

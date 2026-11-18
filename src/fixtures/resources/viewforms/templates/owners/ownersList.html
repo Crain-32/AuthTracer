@@ -1,0 +1,9 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<body>
+<p th:if="${search != null}" th:text="${search.lastName}">searched for</p>
+<p th:text="${query}">query</p>
+<table>
+  <tr><td th:text="${owner.lastName}">last name</td></tr>
+</table>
+</body>
+</html>
