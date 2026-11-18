@@ -143,6 +143,10 @@ Two things to know before changing anything there:
 
 `./gradlew check` runs the unit tests, the UI tests, the integration tests and the coverage floor.
 
+On GitHub, [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs `check` and `systemTest` on every pull request
+to `main` and every push to it. On a pull request it also runs the pull-request check (`authtracerDiff`) on each
+example service against the pull request's base, so a change that weakens an example's authorization fails there too.
+
 **Performance is a baseline, like the goldens.** The benchmarks are JMH's (`Benchmarks` in `src/perfTest`, no JMH
 Gradle plugin: `PerformanceTests` runs each through JMH's `Runner`, in a JVM of its own with the task's flags). JMH
 warms each up and measures the average time of one operation; its GC profiler measures what one operation allocates,
